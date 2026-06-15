@@ -59,13 +59,26 @@
         .header-left {
             display: flex;
             flex-direction: column;
+            flex: 1;
+            min-width: 0;
         }
 
-        .header h1 {
+        #mainTitle {
             font-size: 26px;
             font-weight: 700;
             letter-spacing: -0.5px;
             color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: pointer;
+            transition: opacity 0.15s;
+            display: inline-block;
+            align-self: flex-start;
+            -webkit-tap-highlight-color: transparent;
+        }
+        #mainTitle:active {
+            opacity: 0.6;
         }
 
         .header .subtitle {
@@ -77,12 +90,12 @@
             letter-spacing: 0.5px;
         }
 
-        /* Кнопки в хедере приподняты выше */
         .header-actions {
             display: flex;
             gap: 16px;
             align-items: center;
             margin-bottom: 4px; 
+            flex-shrink: 0;
         }
 
         .header-btn {
@@ -101,7 +114,7 @@
             stroke: var(--text-main);
             fill: none;
             stroke-width: 2;
-            transition: stroke 0.2s;
+            transition: stroke 0.2s, transform 0.2s;
         }
         .header-btn.active svg {
             stroke: var(--accent);
@@ -111,7 +124,7 @@
         .main-viewport {
             flex: 1;
             overflow-y: auto;
-            padding: 8px 24px 120px;
+            padding: 8px 24px 40px;
             -webkit-overflow-scrolling: touch;
         }
         .main-viewport::-webkit-scrollbar {
@@ -222,8 +235,12 @@
             display: none;
             flex-direction: column;
             flex: 1;
-            padding: 8px 24px 120px;
+            padding: 8px 24px 40px;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .task-container::-webkit-scrollbar {
+            display: none;
         }
 
         .task-list {
@@ -258,6 +275,10 @@
             display: flex;
             align-items: flex-start;
             gap: 12px;
+        }
+
+        .task-clickable-zone {
+            flex: 1;
             cursor: pointer;
         }
 
@@ -287,6 +308,7 @@
             justify-content: center;
             margin-top: 1px;
             flex-shrink: 0;
+            -webkit-tap-highlight-color: transparent;
         }
         .task-item.completed .custom-checkbox {
             background-color: var(--text-main);
@@ -327,6 +349,7 @@
             align-items: center;
             gap: 10px;
             cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
         }
         .sub-step-checkbox {
             width: 16px;
@@ -392,7 +415,7 @@
             display: none;
             flex-direction: column;
             flex: 1;
-            padding: 8px 24px 120px;
+            padding: 8px 24px 40px;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
         }
@@ -413,7 +436,6 @@
             text-align: center;
         }
         
-        /* Интерактивная зона аватарки */
         .profile-avatar {
             width: 86px;
             height: 86px;
@@ -433,14 +455,8 @@
             transition: transform 0.2s;
             -webkit-tap-highlight-color: transparent;
         }
-        .profile-avatar:active {
-            transform: scale(0.95);
-        }
-        .profile-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+        .profile-avatar:active { transform: scale(0.95); }
+        .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
         .profile-avatar-overlay {
             position: absolute;
             bottom: 0; left: 0; right: 0;
@@ -454,11 +470,8 @@
             opacity: 0;
             transition: opacity 0.2s;
         }
-        .profile-avatar:hover .profile-avatar-overlay {
-            opacity: 1;
-        }
+        .profile-avatar:hover .profile-avatar-overlay { opacity: 1; }
 
-        /* Интерактивная строка имени */
         .profile-name-row {
             display: flex;
             align-items: center;
@@ -470,18 +483,9 @@
             border-radius: 8px;
             -webkit-tap-highlight-color: transparent;
         }
-        .profile-name-row:active {
-            background: rgba(0,0,0,0.03);
-        }
-        .profile-name {
-            font-size: 22px;
-            font-weight: 700;
-            letter-spacing: -0.3px;
-        }
-        .profile-name-edit-icon {
-            font-size: 14px;
-            color: var(--text-muted);
-        }
+        .profile-name-row:active { background: rgba(0,0,0,0.03); }
+        .profile-name { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+        .profile-name-edit-icon { font-size: 14px; color: var(--text-muted); }
 
         .profile-rank {
             font-size: 11px;
@@ -517,7 +521,6 @@
             line-height: 1.4;
         }
 
-        /* Сетка быстрой статистики */
         .stats-summary-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -532,19 +535,9 @@
             border: 1px solid rgba(0,0,0,0.02);
             box-shadow: 0 4px 12px rgba(0,0,0,0.01);
         }
-        .stat-summary-value {
-            font-size: 26px;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-        .stat-summary-label {
-            font-size: 11px;
-            color: var(--text-muted);
-            font-weight: 600;
-            margin-top: 2px;
-        }
+        .stat-summary-value { font-size: 26px; font-weight: 700; color: var(--text-main); }
+        .stat-summary-label { font-size: 11px; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
 
-        /* Карточка жизненного баланса */
         .balance-card {
             background: var(--card-bg);
             border-radius: 24px;
@@ -560,12 +553,8 @@
             letter-spacing: 0.5px;
             margin-bottom: 16px;
         }
-        .balance-item {
-            margin-bottom: 16px;
-        }
-        .balance-item:last-child {
-            margin-bottom: 0;
-        }
+        .balance-item { margin-bottom: 16px; }
+        .balance-item:last-child { margin-bottom: 0; }
         .balance-info-row {
             display: flex;
             justify-content: space-between;
@@ -574,24 +563,29 @@
             font-weight: 600;
             margin-bottom: 6px;
         }
-        .balance-cat-name {
-            color: var(--text-main);
+        .balance-cat-name { color: var(--text-main); }
+        .balance-cat-percent { color: var(--text-muted); font-size: 12px; }
+        .balance-progress-bg { height: 6px; background: var(--bg-color); border-radius: 100px; overflow: hidden; }
+        .balance-progress-fill { height: 100%; border-radius: 100px; width: 0%; transition: width 0.4s ease; }
+
+        /* Маленькая аккуратная кнопка сброса в профиле */
+        .profile-reset-btn {
+            background: none;
+            border: none;
+            color: var(--danger);
+            font-size: 13px;
+            font-weight: 600;
+            margin: 32px auto 0;
+            display: block;
+            cursor: pointer;
+            padding: 8px 16px;
+            -webkit-tap-highlight-color: transparent;
+            opacity: 0.7;
+            transition: opacity 0.15s, transform 0.1s;
         }
-        .balance-cat-percent {
-            color: var(--text-muted);
-            font-size: 12px;
-        }
-        .balance-progress-bg {
-            height: 6px;
-            background: var(--bg-color);
-            border-radius: 100px;
-            overflow: hidden;
-        }
-        .balance-progress-fill {
-            height: 100%;
-            border-radius: 100px;
-            width: 0%;
-            transition: width 0.4s ease;
+        .profile-reset-btn:active {
+            opacity: 1;
+            transform: scale(0.98);
         }
 
         /* Листы и меню */
@@ -691,69 +685,10 @@
         .modal-btn { flex: 1; padding: 12px; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; }
         .modal-btn.cancel { background: var(--bg-color); color: var(--text-muted); }
         .modal-btn.save { background: var(--text-main); color: var(--card-bg); }
-
-        /* Навигация */
-        .bottom-nav {
-            position: absolute;
-            bottom: 24px;
-            left: 24px;
-            right: 24px;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 18px;
-            border: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding: 12px;
-            z-index: 10;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.04);
-        }
-
-        .nav-item {
-            background: none;
-            border: none;
-            padding: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            -webkit-tap-highlight-color: transparent;
-            position: relative;
-        }
-        .nav-item svg {
-            width: 22px;
-            height: 22px;
-            stroke: var(--text-main);
-            fill: none;
-            stroke-width: 2;
-        }
-
-        .nav-item::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            bottom: 135%;
-            left: 50%;
-            transform: translateX(-50%) translateY(6px);
-            background-color: var(--text-main);
-            color: var(--card-bg);
-            font-size: 11px;
-            font-weight: 600;
-            padding: 5px 10px;
-            border-radius: 8px;
-            white-space: nowrap;
-            opacity: 0;
-            pointer-events: none;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-            transition: opacity 0.15s ease, transform 0.15s ease;
-            z-index: 100;
-        }
-        .nav-item:hover::after { opacity: 1; transform: translateX(-50%) translateY(0); }
     </style>
 </head>
 <body>
 
-<!-- Скрытые инпуты загрузки изображений -->
 <input type="file" id="globalFileInput" accept="image/*" style="display:none;">
 <input type="file" id="avatarFileInput" accept="image/*" style="display:none;">
 
@@ -764,16 +699,20 @@
             <div class="subtitle" id="subTitle">СФЕРЫ ЖИЗНИ</div>
         </div>
         <div class="header-actions">
+            <!-- Отдельная кнопка Истории Выполненных целей из файла image_76aba1.png -->
+            <button class="header-btn" id="historyBtn" style="display:none;" title="История выполненных">
+                <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
+            </button>
             <button class="header-btn" id="editOrderBtn" title="Изменить порядок">
                 <svg viewBox="0 0 24 24"><path d="M11 5h10M11 12h10M11 19h10M3 6l3-3 3 3M6 3v18M3 18l3 3 3-3"/></svg>
             </button>
             <button class="header-btn" id="profileBtn" title="Личный профиль">
                 <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             </button>
-            <button class="header-btn" id="backBtn" style="display:none;">
+            <button class="header-btn" id="backBtn" style="display:none;" title="Назад к сферам">
                 <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
             </button>
-            <button class="header-btn" id="addActionBtn" style="display:none;">
+            <button class="header-btn" id="addActionBtn" style="display:none;" title="Добавить цель">
                 <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             </button>
         </div>
@@ -784,7 +723,7 @@
         <div class="categories-grid" id="categoriesGrid"></div>
     </div>
 
-    <!-- 2. Задачи внутри сферы -->
+    <!-- 2. Экран списка целей (активные / архив переключаются кнопкой истории) -->
     <div class="task-container" id="taskContainer">
         <ul class="task-list" id="taskList"></ul>
     </div>
@@ -792,12 +731,10 @@
     <!-- 3. Экран Личного Профиля -->
     <div class="profile-container" id="profileContainer">
         <div class="profile-main-card">
-            <!-- Интерактивный аватар -->
             <div class="profile-avatar" id="profileAvatar" title="Сменить аватар">
                 <span id="avatarFallback">S</span>
                 <div class="profile-avatar-overlay">Фото</div>
             </div>
-            <!-- Интерактивный никнейм -->
             <div class="profile-name-row" id="profileNameRow" title="Изменить никнейм">
                 <div class="profile-name" id="profileName">Slava</div>
                 <div class="profile-name-edit-icon">✎</div>
@@ -805,7 +742,7 @@
             <div class="profile-rank" id="profileRank">Новичок</div>
             <div class="profile-motto-box" id="profileMottoBox">
                 <div class="profile-motto-label">Главный фокус года</div>
-                <div class="profile-motto-text" id="profileMottoText">Введите фокусирование на год...</div>
+                <div class="profile-motto-text" id="profileMottoText">2026 — год масштабирования и здоровья</div>
             </div>
         </div>
 
@@ -824,14 +761,17 @@
             <div class="balance-card-title">Баланс жизненных сфер</div>
             <div id="balanceListContainer"></div>
         </div>
+
+        <!-- Перенесенная кнопка сброса всех данных -->
+        <button class="profile-reset-btn" id="profileResetBtn">Сбросить все данные приложения</button>
     </div>
 
     <!-- Меню создания цели -->
     <div class="action-sheet-overlay" id="actionSheetOverlay">
         <div class="action-sheet">
             <div class="action-sheet-title" id="actionSheetTitle">Новая цель</div>
-            <button class="action-sheet-btn" id="actionAddText">📝 Стандартная цель</button>
-            <button class="action-sheet-btn" id="actionUploadPhoto">📸 Цель с фото</button>
+            <button class="action-sheet-btn" id="actionAddText">📝 Обычная цель с планом</button>
+            <button class="action-sheet-btn" id="actionUploadPhoto">📸 Визуализация (Фото + План)</button>
             <button class="action-sheet-btn cancel" id="actionCancel">Отмена</button>
         </div>
     </div>
@@ -853,19 +793,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Панель навигации -->
-    <nav class="bottom-nav">
-        <button class="nav-item" id="navHome" data-tooltip="Главный экран">
-            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-        </button>
-        <button class="nav-item" id="navClear" data-tooltip="Очистить выполненные">
-            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-        </button>
-        <button class="nav-item" id="navReset" data-tooltip="Сбросить все данные">
-            <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-        </button>
-    </nav>
 </div>
 
 <script>
@@ -880,20 +807,21 @@
 
     let categories = JSON.parse(localStorage.getItem('premiumCategoriesList')) || defaultCategories;
     let allTodos = JSON.parse(localStorage.getItem('premiumBoardTodos')) || {};
+    let allArchive = JSON.parse(localStorage.getItem('premiumBoardArchive')) || {};
     let userProfile = JSON.parse(localStorage.getItem('premiumUserProfile')) || {
-        name: "User",
-        motto: "Введите фокусирование на год...",
+        name: "Slava",
+        motto: "2026 — год масштабирования и здоровья",
         avatar: ""
     };
     
     let currentCategory = null;
     let isProfileActive = false;
+    let isShowingHistory = false; 
     let pendingImageBase64 = null;
     let modalMode = "category"; 
     let editingTodoIndex = null;
     let isEditMode = false;
 
-    // Глобальные переменные для Drag-and-Drop
     let dragItem = null;
     let placeholder = null;
     let startX = 0, startY = 0;
@@ -908,6 +836,7 @@
     const addActionBtn = document.getElementById('addActionBtn');
     const editOrderBtn = document.getElementById('editOrderBtn');
     const profileBtn = document.getElementById('profileBtn');
+    const historyBtn = document.getElementById('historyBtn'); 
     const mainTitle = document.getElementById('mainTitle');
     const subTitle = document.getElementById('subTitle');
     const taskList = document.getElementById('taskList');
@@ -928,6 +857,12 @@
     const modalCancelBtn = document.getElementById('modalCancelBtn');
     const modalSaveBtn = document.getElementById('modalSaveBtn');
 
+    // Нажатие на "BOARD" возвращает на главную
+    mainTitle.addEventListener('click', () => {
+        if (isEditMode) toggleEditMode();
+        goHome();
+    });
+
     function renderCategoriesGrid() {
         categoriesGrid.innerHTML = '';
         if (isEditMode) {
@@ -939,7 +874,7 @@
         }
         
         categories.forEach((cat) => {
-            const activeCount = (allTodos[cat.id] || []).filter(t => !t.completed).length;
+            const activeCount = (allTodos[cat.id] || []).length;
             const item = document.createElement('div');
             item.className = 'grid-item';
             item.style.backgroundColor = cat.color || '#FFFFFF';
@@ -974,7 +909,6 @@
         categoriesGrid.appendChild(addCard);
     }
 
-    // --- Механизм Сортировки ---
     function handlePointerDown(e, item) {
         if (!isEditMode) return;
         if (e.target.closest('.delete-cat-btn')) return;
@@ -1077,20 +1011,21 @@
     }
     editOrderBtn.addEventListener('click', toggleEditMode);
 
-    // --- Логика навигации экранов ---
     function openCategory(cat) {
         currentCategory = cat.id;
         isProfileActive = false;
+        isShowingHistory = false; 
         mainViewport.style.display = 'none';
         profileContainer.style.display = 'none';
         taskContainer.style.display = 'flex';
         
         backBtn.style.display = 'block';
         addActionBtn.style.display = 'block';
+        historyBtn.style.display = 'block'; 
         editOrderBtn.style.display = 'none';
         profileBtn.style.display = 'none';
         
-        mainTitle.textContent = cat.title;
+        mainTitle.textContent = "BOARD";
         subTitle.textContent = "План реализации";
         actionSheetTitle.textContent = cat.title;
         renderTasks();
@@ -1107,10 +1042,10 @@
 
         backBtn.style.display = 'block';
         addActionBtn.style.display = 'none';
+        historyBtn.style.display = 'none';
         editOrderBtn.style.display = 'none';
         profileBtn.style.display = 'none';
 
-        mainTitle.textContent = "ПРОФИЛЬ";
         subTitle.textContent = "Личная аналитика";
         renderProfileStats();
     }
@@ -1119,31 +1054,34 @@
     function goHome() {
         currentCategory = null;
         isProfileActive = false;
+        isShowingHistory = false;
         mainViewport.style.display = 'block';
         taskContainer.style.display = 'none';
         profileContainer.style.display = 'none';
         
         backBtn.style.display = 'none';
         addActionBtn.style.display = 'none';
+        historyBtn.style.display = 'none';
         editOrderBtn.style.display = 'block';
         profileBtn.style.display = 'block';
         
-        mainTitle.textContent = "BOARD";
         subTitle.textContent = "СФЕРЫ ЖИЗНИ";
         renderCategoriesGrid();
     }
     backBtn.addEventListener('click', goHome);
 
-    // --- Аналитика и рендеринг профиля ---
+    historyBtn.addEventListener('click', () => {
+        isShowingHistory = !isShowingHistory;
+        renderTasks();
+    });
+
     function renderProfileStats() {
         document.getElementById('profileName').textContent = userProfile.name;
         document.getElementById('profileMottoText').textContent = userProfile.motto;
 
-        // Обработка кастомной аватарки
         const avatarContainer = document.getElementById('profileAvatar');
         const fallbackSpan = document.getElementById('avatarFallback');
         
-        // Удаляем старый тег img, если он был
         const oldImg = avatarContainer.querySelector('img');
         if (oldImg) oldImg.remove();
 
@@ -1163,9 +1101,11 @@
         balanceListContainer.innerHTML = '';
 
         categories.forEach(cat => {
-            const list = allTodos[cat.id] || [];
-            const total = list.length;
-            const completed = list.filter(t => t.completed).length;
+            const activeList = allTodos[cat.id] || [];
+            const archiveList = allArchive[cat.id] || [];
+            
+            const total = activeList.length + archiveList.length;
+            const completed = archiveList.length;
 
             totalGoals += total;
             completedGoals += completed;
@@ -1189,110 +1129,125 @@
         document.getElementById('statTotalGoals').textContent = totalGoals;
         document.getElementById('statCompletedGoals').textContent = completedGoals;
 
-        // Расчет уровня геймификации
         let rank = "Новичок фокуса";
         if (completedGoals >= 5 && completedGoals < 15) rank = "Создатель реальности";
         else if (completedGoals >= 15) rank = "Магистр баланса 👑";
         document.getElementById('profileRank').textContent = rank;
     }
 
-    // Изменение аватарки по клику
-    document.getElementById('profileAvatar').addEventListener('click', () => {
-        avatarFileInput.click();
-    });
-
-    avatarFileInput.addEventListener('change', (event) => {
-        const file = event.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const img = new Image();
-            img.onload = function() {
-                const canvas = document.createElement('canvas');
-                const size = 240; // Оптимальный размер квадратного аватара
-                canvas.width = size; canvas.height = size;
-                const ctx = canvas.getContext('2d');
-                
-                // Кроп по центру в квадрат
-                const side = Math.min(img.width, img.height);
-                ctx.drawImage(img, (img.width - side) / 2, (img.height - side) / 2, side, side, 0, 0, size, size);
-                
-                userProfile.avatar = canvas.toDataURL('image/jpeg', 0.85);
-                saveData();
-                renderProfileStats();
-                avatarFileInput.value = '';
-            };
-            img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-    });
-
-    // Изменение никнейма по клику
-    document.getElementById('profileNameRow').addEventListener('click', () => {
-        modalMode = "edit-name";
-        modalPlanInput.style.display = "none";
-        modalTextInput.value = userProfile.name;
-        openInputModal("Изменить никнейм", "Введите ваше имя для профиля:", "Например: Slava");
-    });
-
-    // Редактирование фокуса года по клику
-    document.getElementById('profileMottoBox').addEventListener('click', () => {
-        modalMode = "edit-motto";
-        modalPlanInput.style.display = "none";
-        modalTextInput.value = userProfile.motto;
-        openInputModal("Фокус года", "Задайте ваш главный вектор или девиз:", "Например: Год масштабирования и здоровья");
-    });
-
-    function deleteCategory(id, event) {
-        if (event) event.stopPropagation();
-        if (confirm("Удалить эту сферу и все цели внутри нее?")) {
-            categories = categories.filter(c => c.id !== id);
-            delete allTodos[id];
-            saveData();
-            renderCategoriesGrid();
-        }
-    }
-
     function renderTasks() {
         taskList.innerHTML = '';
-        const tasks = allTodos[currentCategory] || [];
         
-        tasks.forEach((task, tIndex) => {
-            const li = document.createElement('li');
-            li.className = `task-item ${task.completed ? 'completed' : ''}`;
+        if (isShowingHistory) {
+            // --- РЕЖИМ 1: ИСТОРИЯ ВЫПОЛНЕННЫХ ЦЕЛЕЙ (АРХИВ) ---
+            historyBtn.classList.add('active');
+            addActionBtn.style.display = 'none'; 
+            subTitle.textContent = "История успехов";
+
+            const archivedTasks = allArchive[currentCategory] || [];
             
-            let planHtml = '';
-            if (task.steps && task.steps.length > 0) {
-                planHtml = `<div class="action-plan-box"><div class="plan-title">План реализации:</div>`;
-                task.steps.forEach((step, sIndex) => {
-                    planHtml += `
-                        <div class="sub-step-item ${step.completed ? 'sub-completed' : ''}" onclick="toggleSubStep(${tIndex}, ${sIndex}, event)">
-                            <div class="sub-step-checkbox"></div>
-                            <span class="sub-step-text">${step.text}</span>
-                        </div>
-                    `;
-                });
-                planHtml += `</div>`;
+            if (archivedTasks.length === 0) {
+                taskList.innerHTML = `
+                    <div style="text-align: center; color: var(--text-muted); padding: 40px 20px; font-size: 14px; font-weight: 500; line-height: 1.5;">
+                        В этой категории пока нет завершенных побед.<br>Выполняйте цели на основном экране, и они появятся здесь.
+                    </div>
+                `;
+                return;
             }
 
-            li.innerHTML = `
-                <div class="task-body">
-                    <div class="task-main-row">
-                        <div class="custom-checkbox" onclick="toggleTask(${tIndex})"></div>
-                        <div style="flex:1;" onclick="toggleTask(${tIndex})">
-                            ${task.text ? `<span class="task-text">${task.text}</span>` : ''}
-                            ${task.image ? `<img src="${task.image}" class="task-media" alt="Фото">` : ''}
+            archivedTasks.forEach((task, aIndex) => {
+                const li = document.createElement('li');
+                li.className = 'task-item completed';
+                
+                let planHtml = '';
+                if (task.steps && task.steps.length > 0) {
+                    planHtml = `<div class="action-plan-box"><div class="plan-title">Было реализовано:</div>`;
+                    task.steps.forEach(step => {
+                        planHtml += `
+                            <div class="sub-step-item sub-completed" style="pointer-events: none;">
+                                <div class="sub-step-checkbox"></div>
+                                <span class="sub-step-text">${step.text}</span>
+                            </div>
+                        `;
+                    });
+                    planHtml += `</div>`;
+                }
+
+                li.innerHTML = `
+                    <div class="task-body">
+                        <div class="task-main-row">
+                            <!-- Нажатие на заполненный чекбокс ДОСТАЕТ цель из архива обратно в активные -->
+                            <div class="custom-checkbox" onclick="restoreTaskFromArchive(${aIndex})" title="Вернуть цель в активные"></div>
+                            <div class="task-clickable-zone" onclick="restoreTaskFromArchive(${aIndex})" title="Вернуть цель в активные">
+                                ${task.text ? `<span class="task-text" style="color: var(--text-muted);">${task.text}</span>` : ''}
+                                ${task.image ? `<img src="${task.image}" class="task-media" alt="Фото" style="opacity: 0.4;">` : ''}
+                                <div style="font-size: 11px; color: var(--text-muted); margin-top: 5px; font-weight: 600;">Выполнено: ${task.archivedAt || 'Ранее'}</div>
+                            </div>
                         </div>
+                        ${planHtml}
                     </div>
-                    ${planHtml}
-                </div>
-                <div class="task-actions">
-                    <button class="edit-task-btn" onclick="openEditTaskModal(${tIndex})" title="Редактировать">✎</button>
-                    <button class="delete-task-btn" onclick="deleteTask(${tIndex})" title="Удалить">&times;</button>
-                </div>
-            `;
-            taskList.appendChild(li);
-        });
+                    <div class="task-actions">
+                        <button class="delete-task-btn" onclick="deleteArchivedTask(${aIndex})" title="Удалить из истории навсегда">&times;</button>
+                    </div>
+                `;
+                taskList.appendChild(li);
+            });
+
+        } else {
+            // --- РЕЖИМ 2: ТЕКУЩИЕ АКТИВНЫЕ ЦЕЛИ ---
+            historyBtn.classList.remove('active');
+            addActionBtn.style.display = 'block';
+            subTitle.textContent = "План реализации";
+
+            const tasks = allTodos[currentCategory] || [];
+            
+            if (tasks.length === 0) {
+                taskList.innerHTML = `
+                    <div style="text-align: center; color: var(--text-muted); padding: 40px 20px; font-size: 14px; font-weight: 500;">
+                        Здесь пока пусто. Нажмите «+» вверху,<br>чтобы добавить свою первую цель.
+                    </div>
+                `;
+                return;
+            }
+
+            tasks.forEach((task, tIndex) => {
+                const li = document.createElement('li');
+                li.className = 'task-item';
+                
+                let planHtml = '';
+                if (task.steps && task.steps.length > 0) {
+                    planHtml = `<div class="action-plan-box"><div class="plan-title">План реализации:</div>`;
+                    task.steps.forEach((step, sIndex) => {
+                        planHtml += `
+                            <div class="sub-step-item ${step.completed ? 'sub-completed' : ''}" onclick="toggleSubStep(${tIndex}, ${sIndex}, event)">
+                                <div class="sub-step-checkbox"></div>
+                                <span class="sub-step-text">${step.text}</span>
+                            </div>
+                        `;
+                    });
+                    planHtml += `</div>`;
+                }
+
+                li.innerHTML = `
+                    <div class="task-body">
+                        <div class="task-main-row">
+                            <!-- Нажатие на чекбокс АВТОМАТИЧЕСКИ отправляет цель в архив -->
+                            <div class="custom-checkbox" onclick="autoArchiveTask(${tIndex})"></div>
+                            <div class="task-clickable-zone" onclick="openEditTaskModal(${tIndex})">
+                                ${task.text ? `<span class="task-text">${task.text}</span>` : ''}
+                                ${task.image ? `<img src="${task.image}" class="task-media" alt="Фото">` : ''}
+                            </div>
+                        </div>
+                        ${planHtml}
+                    </div>
+                    <div class="task-actions">
+                        <button class="edit-task-btn" onclick="openEditTaskModal(${tIndex})" title="Редактировать">✎</button>
+                        <button class="delete-task-btn" onclick="deleteTask(${tIndex})" title="Удалить">&times;</button>
+                    </div>
+                `;
+                taskList.appendChild(li);
+            });
+        }
     }
 
     window.openEditTaskModal = function(index) {
@@ -1309,6 +1264,41 @@
         event.stopPropagation(); 
         const task = allTodos[currentCategory][tIndex];
         task.steps[sIndex].completed = !task.steps[sIndex].completed;
+        saveData();
+        renderTasks();
+    };
+
+    // Автоматическая архивация при клике по чекбоксу главной цели
+    window.autoArchiveTask = function(index) {
+        const task = allTodos[currentCategory][index];
+        task.completed = true;
+        
+        // Фиксируем текущую дату выполнения
+        const currentDateStr = new Date().toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        task.archivedAt = currentDateStr;
+
+        if (!allArchive[currentCategory]) allArchive[currentCategory] = [];
+        allArchive[currentCategory].push(task);
+
+        // Удаляем из основного списка
+        allTodos[currentCategory].splice(index, 1);
+        
+        saveData();
+        renderTasks();
+    };
+
+    // Возврат из архива обратно в активные
+    window.restoreTaskFromArchive = function(index) {
+        const task = allArchive[currentCategory][index];
+        task.completed = false;
+        delete task.archivedAt;
+
+        if (!allTodos[currentCategory]) allTodos[currentCategory] = [];
+        allTodos[currentCategory].push(task);
+
+        // Удаляем из архива
+        allArchive[currentCategory].splice(index, 1);
+
         saveData();
         renderTasks();
     };
@@ -1409,11 +1399,6 @@
         }
     });
 
-    window.toggleTask = function(index) {
-        allTodos[currentCategory][index].completed = !allTodos[currentCategory][index].completed;
-        saveData(); renderTasks();
-    };
-
     window.deleteTask = function(index) {
         if (confirm("Удалить эту цель?")) {
             allTodos[currentCategory].splice(index, 1);
@@ -1421,26 +1406,79 @@
         }
     };
 
+    window.deleteArchivedTask = function(index) {
+        if (confirm("Удалить цель из архива навсегда? Данные спишутся из статистики профиля.")) {
+            allArchive[currentCategory].splice(index, 1);
+            saveData(); renderTasks();
+        }
+    };
+
+    document.getElementById('profileAvatar').addEventListener('click', () => {
+        avatarFileInput.click();
+    });
+
+    avatarFileInput.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                const size = 240; 
+                canvas.width = size; canvas.height = size;
+                const ctx = canvas.getContext('2d');
+                const side = Math.min(img.width, img.height);
+                ctx.drawImage(img, (img.width - side) / 2, (img.height - side) / 2, side, side, 0, 0, size, size);
+                userProfile.avatar = canvas.toDataURL('image/jpeg', 0.85);
+                saveData(); renderProfileStats(); avatarFileInput.value = '';
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    });
+
+    document.getElementById('profileNameRow').addEventListener('click', () => {
+        modalMode = "edit-name";
+        modalPlanInput.style.display = "none";
+        modalTextInput.value = userProfile.name;
+        openInputModal("Изменить никнейм", "Введите ваше имя для профиля:", "Например: Slava");
+    });
+
+    document.getElementById('profileMottoBox').addEventListener('click', () => {
+        modalMode = "edit-motto";
+        modalPlanInput.style.display = "none";
+        modalTextInput.value = userProfile.motto;
+        openInputModal("Фокус года", "Задайте ваш главный вектор или девиз:", "Например: Год масштабирования и здоровья");
+    });
+
+    function deleteCategory(id, event) {
+        if (event) event.stopPropagation();
+        if (confirm("Удалить эту сферу, а также все активные и архивные цели внутри нее?")) {
+            categories = categories.filter(c => c.id !== id);
+            delete allTodos[id];
+            delete allArchive[id];
+            saveData(); renderCategoriesGrid();
+        }
+    }
+
     function saveData() {
         localStorage.setItem('premiumCategoriesList', JSON.stringify(categories));
         localStorage.setItem('premiumBoardTodos', JSON.stringify(allTodos));
+        localStorage.setItem('premiumBoardArchive', JSON.stringify(allArchive));
         localStorage.setItem('premiumUserProfile', JSON.stringify(userProfile));
     }
 
-    document.getElementById('navHome').addEventListener('click', () => { if (isEditMode) toggleEditMode(); goHome(); });
-    document.getElementById('navClear').addEventListener('click', () => {
-        if (!currentCategory) return alert("Сначала откройте какую-либо сферу!");
-        if (allTodos[currentCategory]) {
-            allTodos[currentCategory] = allTodos[currentCategory].filter(t => !t.completed);
-            saveData(); renderTasks();
-        }
-    });
-
-    document.getElementById('navReset').addEventListener('click', () => {
-        if (confirm("Сбросить приложение? Это сотрет все созданные разделы, фотографии и профиль.")) {
+    // Слушатель для кнопки глубокого очищения данных внутри профиля
+    document.getElementById('profileResetBtn').addEventListener('click', () => {
+        if (confirm("Сбросить приложение? Это навсегда сотрет все созданные сферы, историю целей, фотографии и ваш профиль.")) {
             localStorage.clear();
-            categories = defaultCategories; allTodos = {}; userProfile = { name: "User", motto: "Введите фокусирование на год...", avatar: "" };
-            isEditMode = false; goHome();
+            categories = defaultCategories; 
+            allTodos = {}; 
+            allArchive = {};
+            userProfile = { name: "Slava", motto: "2026 — год масштабирования и здоровья", avatar: "" };
+            isEditMode = false; 
+            goHome();
         }
     });
 
