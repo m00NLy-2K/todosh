@@ -517,7 +517,6 @@
             font-size: 14px;
             font-weight: 600;
             color: var(--text-main);
-            font-style: italic;
             line-height: 1.4;
         }
 
@@ -699,7 +698,6 @@
             <div class="subtitle" id="subTitle">СФЕРЫ ЖИЗНИ</div>
         </div>
         <div class="header-actions">
-            <!-- Отдельная кнопка Истории Выполненных целей из файла image_76aba1.png -->
             <button class="header-btn" id="historyBtn" style="display:none;" title="История выполненных">
                 <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
             </button>
@@ -723,7 +721,7 @@
         <div class="categories-grid" id="categoriesGrid"></div>
     </div>
 
-    <!-- 2. Экран списка целей (активные / архив переключаются кнопкой истории) -->
+    <!-- 2. Экран списка целей -->
     <div class="task-container" id="taskContainer">
         <ul class="task-list" id="taskList"></ul>
     </div>
@@ -732,17 +730,17 @@
     <div class="profile-container" id="profileContainer">
         <div class="profile-main-card">
             <div class="profile-avatar" id="profileAvatar" title="Сменить аватар">
-                <span id="avatarFallback">S</span>
+                <span id="avatarFallback">P</span>
                 <div class="profile-avatar-overlay">Фото</div>
             </div>
             <div class="profile-name-row" id="profileNameRow" title="Изменить никнейм">
-                <div class="profile-name" id="profileName">Slava</div>
+                <div class="profile-name" id="profileName">Профиль</div>
                 <div class="profile-name-edit-icon">✎</div>
             </div>
-            <div class="profile-rank" id="profileRank">Новичок</div>
+            <div class="profile-rank" id="profileRank">Новичок фокуса</div>
             <div class="profile-motto-box" id="profileMottoBox">
                 <div class="profile-motto-label">Главный фокус года</div>
-                <div class="profile-motto-text" id="profileMottoText">2026 — год масштабирования и здоровья</div>
+                <div class="profile-motto-text" id="profileMottoText" style="opacity: 0.5;">Введите цель...</div>
             </div>
         </div>
 
@@ -762,7 +760,6 @@
             <div id="balanceListContainer"></div>
         </div>
 
-        <!-- Перенесенная кнопка сброса всех данных -->
         <button class="profile-reset-btn" id="profileResetBtn">Сбросить все данные приложения</button>
     </div>
 
@@ -808,9 +805,11 @@
     let categories = JSON.parse(localStorage.getItem('premiumCategoriesList')) || defaultCategories;
     let allTodos = JSON.parse(localStorage.getItem('premiumBoardTodos')) || {};
     let allArchive = JSON.parse(localStorage.getItem('premiumBoardArchive')) || {};
+    
+    // Нейтральное стартовое состояние профиля без хардкода
     let userProfile = JSON.parse(localStorage.getItem('premiumUserProfile')) || {
-        name: "Slava",
-        motto: "2026 — год масштабирования и здоровья",
+        name: "",
+        motto: "",
         avatar: ""
     };
     
@@ -857,7 +856,6 @@
     const modalCancelBtn = document.getElementById('modalCancelBtn');
     const modalSaveBtn = document.getElementById('modalSaveBtn');
 
-    // Нажатие на "BOARD" возвращает на главную
     mainTitle.addEventListener('click', () => {
         if (isEditMode) toggleEditMode();
         goHome();
@@ -903,7 +901,7 @@
             modalPlanInput.style.display = "none";
             modalTextInput.value = "";
             modalPlanInput.value = "";
-            openInputModal("Новая сфера", "Какое направление вы хотите добавить?", "Например: Духовный рост, Хобби...");
+            openInputModal("Новая сфера", "Какое направление вы хотите добавить?", "Например: Развлечения, Хобби...");
         };
         addCard.innerHTML = `<div class="grid-text">+ Создать сферу</div>`;
         categoriesGrid.appendChild(addCard);
@@ -1076,8 +1074,20 @@
     });
 
     function renderProfileStats() {
-        document.getElementById('profileName').textContent = userProfile.name;
-        document.getElementById('profileMottoText').textContent = userProfile.motto;
+        // Рендеринг имени или нейтрального плейсхолдера
+        document.getElementById('profileName').textContent = userProfile.name || "Профиль";
+
+        // Рендеринг фокуса/девиза с полупрозрачным шрифтом при пустом значении
+        const mottoEl = document.getElementById('profileMottoText');
+        if (userProfile.motto) {
+            mottoEl.textContent = userProfile.motto;
+            mottoEl.style.opacity = "1";
+            mottoEl.style.fontStyle = "italic";
+        } else {
+            mottoEl.textContent = "Введите цель...";
+            mottoEl.style.opacity = "0.4";
+            mottoEl.style.fontStyle = "normal";
+        }
 
         const avatarContainer = document.getElementById('profileAvatar');
         const fallbackSpan = document.getElementById('avatarFallback');
@@ -1092,7 +1102,7 @@
             avatarContainer.insertBefore(img, avatarContainer.firstChild);
         } else {
             fallbackSpan.style.display = 'block';
-            fallbackSpan.textContent = userProfile.name ? userProfile.name.charAt(0).toUpperCase() : 'S';
+            fallbackSpan.textContent = userProfile.name ? userProfile.name.charAt(0).toUpperCase() : 'P';
         }
 
         let totalGoals = 0;
@@ -1139,7 +1149,6 @@
         taskList.innerHTML = '';
         
         if (isShowingHistory) {
-            // --- РЕЖИМ 1: ИСТОРИЯ ВЫПОЛНЕННЫХ ЦЕЛЕЙ (АРХИВ) ---
             historyBtn.classList.add('active');
             addActionBtn.style.display = 'none'; 
             subTitle.textContent = "История успехов";
@@ -1176,7 +1185,6 @@
                 li.innerHTML = `
                     <div class="task-body">
                         <div class="task-main-row">
-                            <!-- Нажатие на заполненный чекбокс ДОСТАЕТ цель из архива обратно в активные -->
                             <div class="custom-checkbox" onclick="restoreTaskFromArchive(${aIndex})" title="Вернуть цель в активные"></div>
                             <div class="task-clickable-zone" onclick="restoreTaskFromArchive(${aIndex})" title="Вернуть цель в активные">
                                 ${task.text ? `<span class="task-text" style="color: var(--text-muted);">${task.text}</span>` : ''}
@@ -1194,7 +1202,6 @@
             });
 
         } else {
-            // --- РЕЖИМ 2: ТЕКУЩИЕ АКТИВНЫЕ ЦЕЛИ ---
             historyBtn.classList.remove('active');
             addActionBtn.style.display = 'block';
             subTitle.textContent = "План реализации";
@@ -1231,7 +1238,6 @@
                 li.innerHTML = `
                     <div class="task-body">
                         <div class="task-main-row">
-                            <!-- Нажатие на чекбокс АВТОМАТИЧЕСКИ отправляет цель в архив -->
                             <div class="custom-checkbox" onclick="autoArchiveTask(${tIndex})"></div>
                             <div class="task-clickable-zone" onclick="openEditTaskModal(${tIndex})">
                                 ${task.text ? `<span class="task-text">${task.text}</span>` : ''}
@@ -1268,26 +1274,22 @@
         renderTasks();
     };
 
-    // Автоматическая архивация при клике по чекбоксу главной цели
     window.autoArchiveTask = function(index) {
         const task = allTodos[currentCategory][index];
         task.completed = true;
         
-        // Фиксируем текущую дату выполнения
         const currentDateStr = new Date().toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' });
         task.archivedAt = currentDateStr;
 
         if (!allArchive[currentCategory]) allArchive[currentCategory] = [];
         allArchive[currentCategory].push(task);
 
-        // Удаляем из основного списка
         allTodos[currentCategory].splice(index, 1);
         
         saveData();
         renderTasks();
     };
 
-    // Возврат из архива обратно в активные
     window.restoreTaskFromArchive = function(index) {
         const task = allArchive[currentCategory][index];
         task.completed = false;
@@ -1296,7 +1298,6 @@
         if (!allTodos[currentCategory]) allTodos[currentCategory] = [];
         allTodos[currentCategory].push(task);
 
-        // Удаляем из архива
         allArchive[currentCategory].splice(index, 1);
 
         saveData();
@@ -1325,7 +1326,7 @@
         modalPlanInput.style.display = "block";
         modalTextInput.value = "";
         modalPlanInput.value = "";
-        setTimeout(() => openInputModal("Новая цель", "Опишите цель и шаги к ней через запятую:", "Например: Купить машину"), 200);
+        setTimeout(() => openInputModal("Новая цель", "Опишите цель и шаги к ней через запятую:", "Например: Начать утренние пробежки"), 200);
     });
 
     actionUploadPhoto.addEventListener('click', () => { closeActionSheet(); globalFileInput.click(); });
@@ -1391,10 +1392,10 @@
             oldTask.text = textVal; oldTask.steps = parsedSteps;
             saveData(); renderTasks(); closeInputModal(); editingTodoIndex = null;
         } else if (modalMode === "edit-motto") {
-            userProfile.motto = textVal || "Задать главный вектор года";
+            userProfile.motto = textVal; 
             saveData(); renderProfileStats(); closeInputModal();
         } else if (modalMode === "edit-name") {
-            userProfile.name = textVal || "Slava";
+            userProfile.name = textVal;
             saveData(); renderProfileStats(); closeInputModal();
         }
     });
@@ -1442,14 +1443,14 @@
         modalMode = "edit-name";
         modalPlanInput.style.display = "none";
         modalTextInput.value = userProfile.name;
-        openInputModal("Изменить никнейм", "Введите ваше имя для профиля:", "Например: Slava");
+        openInputModal("Никнейм профиля", "Введите имя для отображения:", "Например: Укажите ваше имя...");
     });
 
     document.getElementById('profileMottoBox').addEventListener('click', () => {
         modalMode = "edit-motto";
         modalPlanInput.style.display = "none";
         modalTextInput.value = userProfile.motto;
-        openInputModal("Фокус года", "Задайте ваш главный вектор или девиз:", "Например: Год масштабирования и здоровья");
+        openInputModal("Главная цель", "Укажите ваш главный вектор развития:", "Введите цель...");
     });
 
     function deleteCategory(id, event) {
@@ -1469,14 +1470,13 @@
         localStorage.setItem('premiumUserProfile', JSON.stringify(userProfile));
     }
 
-    // Слушатель для кнопки глубокого очищения данных внутри профиля
     document.getElementById('profileResetBtn').addEventListener('click', () => {
-        if (confirm("Сбросить приложение? Это навсегда сотрет все созданные сферы, историю целей, фотографии и ваш профиль.")) {
+        if (confirm("Сбросить приложение? Это навсегда сотрет все созданные сферы, историю целей, фотографии и настройки профиля.")) {
             localStorage.clear();
             categories = defaultCategories; 
             allTodos = {}; 
             allArchive = {};
-            userProfile = { name: "Slava", motto: "2026 — год масштабирования и здоровья", avatar: "" };
+            userProfile = { name: "", motto: "", avatar: "" };
             isEditMode = false; 
             goHome();
         }
