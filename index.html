@@ -137,10 +137,11 @@
             touch-action: auto;
         }
 
-        /* Визуальный стиль режима редактирования структур */
+        /* Визуальный стиль режима редактирования структур + ЗАПРЕТ Скролла со смартфона */
         .edit-mode-active .grid-item:not(.add-btn-card) {
             border: 1.5px dashed var(--text-muted);
             cursor: grab;
+            touch-action: none !important; /* Убирает конфликт скролла и перетаскивания на iOS/Android */
         }
 
         /* Состояние перетаскиваемой карточки */
@@ -365,7 +366,7 @@
             color: var(--text-muted);
         }
 
-        /* Блок кнопок управления внутри задачи (Редактирование и Удаление) */
+        /* Кнопки действий */
         .task-actions {
             display: flex;
             gap: 12px;
@@ -574,7 +575,7 @@
             align-items: center;
             justify-content: center;
             -webkit-tap-highlight-color: transparent;
-            position: relative; /* Необходимо для абсолютного позиционирования тултипа */
+            position: relative;
         }
         .nav-item svg {
             width: 22px;
@@ -584,11 +585,11 @@
             stroke-width: 2;
         }
 
-        /* Премиальный механизм мини-обозначений (Тултипы) */
+        /* Тултипы */
         .nav-item::after {
             content: attr(data-tooltip);
             position: absolute;
-            bottom: 135%; /* Выталкиваем подсказку наверх над панелью */
+            bottom: 135%;
             left: 50%;
             transform: translateX(-50%) translateY(6px);
             background-color: var(--text-main);
@@ -605,7 +606,6 @@
             z-index: 100;
         }
 
-        /* Анимация проявления при наведении */
         .nav-item:hover::after {
             opacity: 1;
             transform: translateX(-50%) translateY(0);
@@ -646,8 +646,8 @@
     <div class="action-sheet-overlay" id="actionSheetOverlay">
         <div class="action-sheet">
             <div class="action-sheet-title" id="actionSheetTitle">Новая цель</div>
-            <button class="action-sheet-btn" id="actionAddText">📝 Обычная цель с планом</button>
-            <button class="action-sheet-btn" id="actionUploadPhoto">📸 Визуализация (Фото + План)</button>
+            <button class="action-sheet-btn" id="actionAddText">📝 Стандартная цель</button>
+            <button class="action-sheet-btn" id="actionUploadPhoto">📸 Цель с фото</button>
             <button class="action-sheet-btn cancel" id="actionCancel">Отмена</button>
         </div>
     </div>
@@ -683,7 +683,6 @@
 </div>
 
 <script>
-    // Начальные премиальные категории
     const defaultCategories = [
         { id: "cat_wealth", title: "Богатство и Успех", color: "#FFF9E6" },
         { id: "cat_health", title: "Здоровье и Спорт", color: "#E6F7ED" },
@@ -734,7 +733,6 @@
     const modalCancelBtn = document.getElementById('modalCancelBtn');
     const modalSaveBtn = document.getElementById('modalSaveBtn');
 
-    // Отрисовка главной сетки сфер
     function renderCategoriesGrid() {
         categoriesGrid.innerHTML = '';
         if (isEditMode) {
@@ -767,7 +765,6 @@
             categoriesGrid.appendChild(item);
         });
 
-        // Карточка создания новой сферы
         const addCard = document.createElement('div');
         addCard.className = 'grid-item add-btn-card';
         addCard.onclick = () => {
@@ -782,7 +779,7 @@
         categoriesGrid.appendChild(addCard);
     }
 
-    // --- Механизм Drag-and-Drop Сортировки ---
+    // --- Улучшенный Механизм Сортировки с защитой от скролла и Автопрокруткой ленты ---
     function handlePointerDown(e, item) {
         if (!isEditMode) return;
         if (e.target.closest('.delete-cat-btn')) return;
@@ -800,7 +797,6 @@
         initialLeft = rect.left;
         initialTop = rect.top;
         
-        dragItem.style.touchAction = 'none';
         dragItem.style.width = rect.width + 'px';
         dragItem.style.height = rect.height + 'px';
         dragItem.style.left = initialLeft + 'px';
@@ -825,6 +821,16 @@
         
         dragItem.style.left = (initialLeft + dx) + 'px';
         dragItem.style.top = (initialTop + dy) + 'px';
+        
+        // Автоматический скролл контейнера при приближении к границам экрана
+        const viewRect = mainViewport.getBoundingClientRect();
+        const scrollZone = 80; // Чувствительность зоны краев (в пикселях)
+        
+        if (e.clientY < viewRect.top + scrollZone) {
+            mainViewport.scrollTop -= 10; // Скроллим вверх
+        } else if (e.clientY > viewRect.bottom - scrollZone) {
+            mainViewport.scrollTop += 10; // Скроллим вниз
+        }
         
         const elementUnder = document.elementFromPoint(e.clientX, e.clientY);
         if (!elementUnder) return;
@@ -858,7 +864,6 @@
         dragItem.style.height = '';
         dragItem.style.left = '';
         dragItem.style.top = '';
-        dragItem.style.touchAction = 'auto';
         
         if (placeholder && placeholder.parentNode) {
             placeholder.parentNode.insertBefore(dragItem, placeholder);
@@ -927,7 +932,6 @@
         }
     }
 
-    // Списки целей и вложенных планов реализации
     function renderTasks() {
         taskList.innerHTML = '';
         const tasks = allTodos[currentCategory] || [];
