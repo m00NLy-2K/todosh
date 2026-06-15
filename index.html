@@ -12,73 +12,104 @@
     <style>
         :root {
             --primary-color: #C5D0E6; 
-            --bg-color: #f8f9fa;
-            --text-dark: #2c3e50;
-            --text-muted: #7f8c8d;
-            --border-color: #e2e8f0;
+            --bg-color: #F8FAFC;       
+            --card-bg: #FFFFFF;
+            --text-main: #0F172A;      
+            --text-muted: #94A3B8;
+            --border-color: #E2E8F0;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             -webkit-user-select: none;
             user-select: none;
         }
 
         body, html {
-            background-color: white;
+            background-color: var(--bg-color);
             width: 100%;
             height: 100%;
             overflow: hidden;
+            color: var(--text-main);
         }
 
-        /* Адаптировано под чистый полноэкранный режим смартфона */
         .app-container {
             width: 100vw;
             height: 100vh;
             display: flex;
             flex-direction: column;
             position: relative;
-            background-color: white;
+            background-color: var(--bg-color);
         }
 
+        /* Нативная шапка с кнопками управления */
         .header {
-            background-color: var(--primary-color);
-            color: var(--text-dark);
-            padding: 45px 20px 20px;
+            background-color: var(--bg-color);
+            padding: 55px 24px 16px;
             text-align: center;
             position: relative;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
             z-index: 10;
         }
 
         .back-btn {
             position: absolute;
-            left: 20px;
-            top: 45px;
-            font-size: 22px;
+            left: 24px;
+            top: 55px;
             background: none;
             border: none;
             cursor: pointer;
-            color: var(--text-dark);
             display: none;
             -webkit-tap-highlight-color: transparent;
+        }
+        .back-btn svg {
+            width: 24px;
+            height: 24px;
+            stroke: var(--text-main);
+            fill: none;
+            stroke-width: 2.5;
+        }
+
+        /* Новая кнопка Плюс в шапке */
+        .add-action-btn {
+            position: absolute;
+            right: 24px;
+            top: 55px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .add-action-btn svg {
+            width: 24px;
+            height: 24px;
+            stroke: var(--text-main);
+            fill: none;
+            stroke-width: 2.5;
         }
 
         .header h1 {
             font-size: 20px;
-            font-weight: 600;
-            letter-spacing: 1.5px;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+            color: var(--text-main);
             text-transform: uppercase;
+            padding: 0 40px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .header .subtitle {
-            font-size: 16px;
+            font-size: 11px;
             margin-top: 4px;
-            font-weight: bold;
-            opacity: 0.8;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
         }
 
         .boards-viewport {
@@ -86,7 +117,7 @@
             overflow-y: scroll;
             scroll-snap-type: y mandatory;
             scroll-behavior: smooth;
-            padding-bottom: 90px;
+            padding-bottom: 110px;
             -webkit-overflow-scrolling: touch;
         }
 
@@ -102,87 +133,76 @@
             grid-template-columns: repeat(3, 1fr);
             grid-template-rows: repeat(3, 1fr);
             gap: 12px;
-            padding: 20px;
+            padding: 10px 20px 20px;
         }
 
         .grid-item {
-            background-color: var(--primary-color);
-            border-radius: 18px;
-            padding: 10px 5px;
+            border-radius: 20px;
+            padding: 14px 8px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: center;
             position: relative;
+            background-size: cover;
+            background-position: center;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
             -webkit-tap-highlight-color: transparent;
         }
 
-        .icon {
-            font-size: 28px;
-            margin-bottom: 6px;
+        .grid-item::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.6));
+            z-index: 1;
+        }
+
+        .grid-item:active {
+            transform: scale(0.94);
         }
 
         .grid-text {
-            color: var(--text-dark);
-            font-size: 10px;
+            color: #FFFFFF;
+            font-size: 11px;
             font-weight: 700;
-            line-height: 1.2;
+            line-height: 1.3;
+            letter-spacing: 0.2px;
             text-transform: uppercase;
+            z-index: 2;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
         }
 
         .badge {
             position: absolute;
-            top: 8px;
-            right: 8px;
-            background-color: #ff5e5e;
-            color: white;
+            top: 10px;
+            right: 10px;
+            background-color: var(--primary-color);
+            color: var(--text-main);
             font-size: 10px;
-            padding: 2px 6px;
-            border-radius: 10px;
-            font-weight: bold;
-            display: none;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 4px;
+            border-radius: 50%;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
 
+        /* Контейнер списка задач без лишних полей ввода */
         .task-container {
             display: none;
             flex-direction: column;
             flex: 1;
-            padding: 20px;
+            padding: 10px 24px 24px;
             overflow-y: auto;
-            padding-bottom: 90px;
-        }
-
-        .input-area {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .input-area input {
-            flex: 1;
-            padding: 12px;
-            border: 2px solid var(--border-color);
-            border-radius: 12px;
-            font-size: 15px;
-            outline: none;
-            -webkit-user-select: text;
-            user-select: text;
-        }
-
-        .input-area input:focus {
-            border-color: var(--primary-color);
-        }
-
-        .input-area button {
-            background-color: var(--primary-color);
-            border: none;
-            width: 45px;
-            border-radius: 12px;
-            font-size: 20px;
-            color: var(--text-dark);
-            font-weight: bold;
-            -webkit-tap-highlight-color: transparent;
+            padding-bottom: 110px;
         }
 
         .task-list {
@@ -193,13 +213,18 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 12px;
-            background-color: var(--bg-color);
-            border-radius: 10px;
-            margin-bottom: 8px;
-            gap: 10px;
+            padding: 16px;
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            margin-bottom: 10px;
+            gap: 14px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.01);
+            border: 1px solid rgba(0,0,0,0.02);
         }
 
+        .task-item.completed {
+            opacity: 0.5;
+        }
         .task-item.completed .task-text {
             text-decoration: line-through;
             color: var(--text-muted);
@@ -208,54 +233,162 @@
         .task-text {
             flex: 1;
             font-size: 15px;
-            color: var(--text-dark);
+            font-weight: 500;
         }
 
-        .task-checkbox {
-            width: 18px;
-            height: 18px;
+        .custom-checkbox {
+            width: 22px;
+            height: 22px;
+            border: 2px solid var(--primary-color);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        .task-item.completed .custom-checkbox {
+            background-color: var(--text-main);
+            border-color: var(--text-main);
+        }
+        .custom-checkbox::after {
+            content: "";
+            width: 5px;
+            height: 9px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+            margin-bottom: 2px;
+            display: none;
+        }
+        .task-item.completed .custom-checkbox::after {
+            display: block;
         }
 
         .delete-task-btn {
             background: none;
             border: none;
-            color: #ff5c5c;
-            font-size: 18px;
+            color: var(--text-muted);
+            font-size: 20px;
+            padding: 0 4px;
+        }
+
+        /* Стильный выезжающий снизу Action Sheet (Нативное меню) */
+        .action-sheet-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex;
+            align-items: flex-end;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+        .action-sheet-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .action-sheet {
+            width: 100%;
+            background: var(--card-bg);
+            border-radius: 28px 28px 0 0;
+            padding: 24px 24px 44px;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.1);
+        }
+        .action-sheet-overlay.active .action-sheet {
+            transform: translateY(0);
+        }
+        .action-sheet-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .action-sheet-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--bg-color);
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 10px;
+            text-align: center;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .action-sheet-btn.cancel {
+            background: transparent;
+            color: #EF4444;
+            margin-bottom: 0;
+            margin-top: 10px;
         }
 
         .bottom-nav {
             position: absolute;
-            bottom: 20px;
-            left: 20px;
-            right: 20px;
-            background: white;
-            border-radius: 25px;
-            border: 1px solid var(--border-color);
+            bottom: 30px;
+            left: 24px;
+            right: 24px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
             display: flex;
             justify-content: space-around;
             align-items: center;
             padding: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
             z-index: 10;
         }
 
         .nav-item {
-            font-size: 22px;
             background: none;
             border: none;
-            padding: 5px 10px;
-            border-radius: 10px;
+            padding: 8px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             -webkit-tap-highlight-color: transparent;
+        }
+        .nav-item svg {
+            width: 22px;
+            height: 22px;
+            stroke: var(--text-main);
+            fill: none;
+            stroke-width: 2;
         }
     </style>
 </head>
 <body>
 
+<!-- Скрытый системный инпут для загрузки медиа -->
+<input type="file" id="globalFileInput" accept="image/*" style="display:none;">
+
 <div class="app-container">
     <header class="header">
-        <button class="back-btn" id="backBtn">←</button>
+        <button class="back-btn" id="backBtn">
+            <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </button>
         <h1 id="mainTitle">MY VISION BOARD</h1>
-        <div class="subtitle" id="subTitle">1</div>
+        <button class="add-action-btn" id="addActionBtn">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <div class="subtitle" id="subTitle">СТРАНИЦА 1</div>
     </header>
 
     <div class="boards-viewport" id="boardsViewport">
@@ -264,59 +397,83 @@
     </div>
 
     <div class="task-container" id="taskContainer">
-        <div class="input-area">
-            <input type="text" id="taskInput" placeholder="Добавить новую задачу..." autocomplete="off">
-            <button id="addTaskBtn">+</button>
-        </div>
         <ul class="task-list" id="taskList"></ul>
     </div>
 
+    <!-- Компонент Action Sheet -->
+    <div class="action-sheet-overlay" id="actionSheetOverlay">
+        <div class="action-sheet">
+            <div class="action-sheet-title" id="actionSheetTitle">Действия с целью</div>
+            <button class="action-sheet-btn" id="actionAddText">📝 Добавить задачу (текст)</button>
+            <button class="action-sheet-btn" id="actionUploadPhoto">🖼️ Загрузить новое фото цели</button>
+            <button class="action-sheet-btn cancel" id="actionCancel">Отмена</button>
+        </div>
+    </div>
+
     <nav class="bottom-nav">
-        <button class="nav-item" id="navInfo">🔔</button>
-        <button class="nav-item" id="navHome">🎛️</button>
-        <button class="nav-item" id="navClear">🎯</button>
-        <button class="nav-item" id="navReset">🔗</button>
+        <button class="nav-item" id="navInfo">
+            <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        </button>
+        <button class="nav-item" id="navHome">
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        </button>
+        <button class="nav-item" id="navClear">
+            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        </button>
+        <button class="nav-item" id="navReset">
+            <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        </button>
     </nav>
 </div>
 
 <script>
     const page1Categories = [
-        { id: "wealth", icon: "💰", title: "Процветание и богатство" },
-        { id: "fame", icon: "🌿", title: "Репутация и слава" },
-        { id: "love", icon: "💍", title: "Любовь и брак" },
-        { id: "family", icon: "☕", title: "Общество и семья" },
-        { id: "health", icon: "📸", title: "Мое фото и здоровье" },
-        { id: "creativity", icon: "🎨", title: "Творчество и дети" },
-        { id: "knowledge", icon: "📚", title: "Образование и знания" },
-        { id: "career", icon: "💼", title: "Карьера и миссия" },
-        { id: "travel", icon: "⛵", title: "Путешествия и менторы" }
+        { id: "wealth", title: "Богатство", img: "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?q=80&w=500&auto=format&fit=crop" },
+        { id: "fame", title: "Слава", img: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=500&auto=format&fit=crop" },
+        { id: "love", title: "Любовь", img: "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?q=80&w=500&auto=format&fit=crop" },
+        { id: "family", title: "Семья", img: "https://images.unsplash.com/photo-1609234656388-0ff363383899?q=80&w=500&auto=format&fit=crop" },
+        { id: "health", title: "Здоровье", img: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?q=80&w=500&auto=format&fit=crop" },
+        { id: "creativity", title: "Творчество", img: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?q=80&w=500&auto=format&fit=crop" },
+        { id: "knowledge", title: "Знания", img: "https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?q=80&w=500&auto=format&fit=crop" },
+        { id: "career", title: "Карьера", img: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=500&auto=format&fit=crop" },
+        { id: "travel", title: "Путешествия", img: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?q=80&w=500&auto=format&fit=crop" }
     ];
 
     const page2Categories = [
-        { id: "rest", icon: "🌴", title: "Отдых и отпуск" },
-        { id: "habits", icon: "⏰", title: "Привычки и рутина" },
-        { id: "spirit", icon: "🧘", title: "Духовный рост" },
-        { id: "shopping", icon: "🛒", title: "Покупки и быт" },
-        { id: "pets", icon: "🐾", title: "Домашние питомцы" },
-        { id: "goals", icon: "🎯", title: "Главные цели" },
-        { id: "sport", icon: "🏃", title: "Спорт и тонус" },
-        { id: "friends", icon: "🥳", title: "Друзья и тусовки" },
-        { id: "home", icon: "🏡", title: "Уют и дом" }
+        { id: "rest", title: "Отдых", img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=500&auto=format&fit=crop" },
+        { id: "habits", title: "Привычки", img: "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?q=80&w=500&auto=format&fit=crop" },
+        { id: "spirit", title: "Дух", img: "https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?q=80&w=500&auto=format&fit=crop" },
+        { id: "shopping", title: "Покупки", img: "https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=500&auto=format&fit=crop" },
+        { id: "pets", title: "Питомцы", img: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=500&auto=format&fit=crop" },
+        { id: "goals", title: "Цели", img: "https://images.unsplash.com/photo-1517842645767-c639042777db?q=80&w=500&auto=format&fit=crop" },
+        { id: "sport", title: "Спорт", img: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=500&auto=format&fit=crop" },
+        { id: "friends", title: "Друзья", img: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?q=80&w=500&auto=format&fit=crop" },
+        { id: "home", title: "Дом", img: "https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=500&auto=format&fit=crop" }
     ];
 
     let allTodos = JSON.parse(localStorage.getItem('visionBoardTodosScroll')) || {};
+    let customImages = JSON.parse(localStorage.getItem('visionBoardImages')) || {};
     let currentCategory = null;
 
     const boardsViewport = document.getElementById('boardsViewport');
     const page1Container = document.getElementById('page1');
     const page2Container = document.getElementById('page2');
     const taskContainer = document.getElementById('taskContainer');
+    
+    // Элементы управления шапки
     const backBtn = document.getElementById('backBtn');
+    const addActionBtn = document.getElementById('addActionBtn');
     const mainTitle = document.getElementById('mainTitle');
     const subTitle = document.getElementById('subTitle');
-    const taskInput = document.getElementById('taskInput');
-    const addTaskBtn = document.getElementById('addTaskBtn');
     const taskList = document.getElementById('taskList');
+
+    // Элементы Action Sheet
+    const actionSheetOverlay = document.getElementById('actionSheetOverlay');
+    const actionSheetTitle = document.getElementById('actionSheetTitle');
+    const actionAddText = document.getElementById('actionAddText');
+    const actionUploadPhoto = document.getElementById('actionUploadPhoto');
+    const actionCancel = document.getElementById('actionCancel');
+    const globalFileInput = document.getElementById('globalFileInput');
 
     function renderPageGrid(container, categoriesList) {
         container.innerHTML = '';
@@ -324,10 +481,13 @@
             const activeTasksCount = (allTodos[cat.id] || []).filter(t => !t.completed).length;
             const item = document.createElement('div');
             item.className = 'grid-item';
+            
+            const currentBg = customImages[cat.id] || cat.img;
+            item.style.backgroundImage = `url('${currentBg}')`;
+            
             item.onclick = () => openCategory(cat);
             item.innerHTML = `
-                <div class="badge" id="badge-${cat.id}" style="display: ${activeTasksCount > 0 ? 'block' : 'none'}">${activeTasksCount}</div>
-                <div class="icon">${cat.icon}</div>
+                <div class="badge" id="badge-${cat.id}" style="display: ${activeTasksCount > 0 ? 'flex' : 'none'}">${activeTasksCount}</div>
                 <div class="grid-text">${cat.title}</div>
             `;
             container.appendChild(item);
@@ -343,16 +503,21 @@
         if (currentCategory) return;
         const viewHeight = boardsViewport.clientHeight;
         const pageIndex = Math.round(boardsViewport.scrollTop / viewHeight) + 1;
-        subTitle.textContent = pageIndex;
+        subTitle.textContent = `СТРАНИЦА ${pageIndex}`;
     });
 
     function openCategory(cat) {
         currentCategory = cat.id;
         boardsViewport.style.display = 'none';
         taskContainer.style.display = 'flex';
+        
+        // Показываем стрелку назад и плюс в шапке
         backBtn.style.display = 'block';
+        addActionBtn.style.display = 'block';
+        
         mainTitle.textContent = cat.title;
-        subTitle.textContent = "Список дел";
+        subTitle.textContent = "План реализации";
+        actionSheetTitle.textContent = cat.title;
         renderTasks();
     }
 
@@ -360,10 +525,14 @@
         currentCategory = null;
         boardsViewport.style.display = 'block';
         taskContainer.style.display = 'none';
+        
+        // Скрываем кнопки управления шапки
         backBtn.style.display = 'none';
+        addActionBtn.style.display = 'none';
+        
         mainTitle.textContent = "MY VISION BOARD";
         const viewHeight = boardsViewport.clientHeight;
-        subTitle.textContent = Math.round(boardsViewport.scrollTop / viewHeight) + 1;
+        subTitle.textContent = `СТРАНИЦА ${Math.round(boardsViewport.scrollTop / viewHeight) + 1}`;
         initAllGrids();
     }
 
@@ -374,7 +543,7 @@
             const li = document.createElement('li');
             li.className = `task-item ${task.completed ? 'completed' : ''}`;
             li.innerHTML = `
-                <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask(${index})">
+                <div class="custom-checkbox" onclick="toggleTask(${index})"></div>
                 <span class="task-text" onclick="toggleTask(${index})">${task.text}</span>
                 <button class="delete-task-btn" onclick="deleteTask(${index})">&times;</button>
             `;
@@ -382,15 +551,83 @@
         });
     }
 
-    function addTask() {
-        const text = taskInput.value.trim();
-        if (!text || !currentCategory) return;
-        if (!allTodos[currentCategory]) allTodos[currentCategory] = [];
-        allTodos[currentCategory].push({ text: text, completed: false });
-        taskInput.value = '';
-        saveData();
-        renderTasks();
+    // Управление меню (Action Sheet)
+    addActionBtn.addEventListener('click', () => {
+        actionSheetOverlay.classList.add('active');
+    });
+
+    function closeActionSheet() {
+        actionSheetOverlay.classList.remove('active');
     }
+
+    actionSheetOverlay.addEventListener('click', (e) => {
+        if (e.target === actionSheetOverlay) closeActionSheet();
+    });
+    actionCancel.addEventListener('click', closeActionSheet);
+
+    // Выбор: Добавить текст
+    actionAddText.addEventListener('click', () => {
+        closeActionSheet();
+        setTimeout(() => {
+            const text = prompt("Введите новую задачу/цель:");
+            if (!text || !text.trim()) return;
+            if (!allTodos[currentCategory]) allTodos[currentCategory] = [];
+            allTodos[currentCategory].push({ text: text.trim(), completed: false });
+            saveData();
+            renderTasks();
+        }, 300); // Таймаут для плавной анимации скрытия меню
+    });
+
+    // Выбор: Загрузить фото
+    actionUploadPhoto.addEventListener('click', () => {
+        closeActionSheet();
+        globalFileInput.click();
+    });
+
+    // Логика сжатия и сохранения картинки
+    globalFileInput.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (!file || !currentCategory) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 450;
+                const MAX_HEIGHT = 450;
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                    if (width > MAX_WIDTH) {
+                        height *= MAX_WIDTH / width;
+                        width = MAX_WIDTH;
+                    }
+                } else {
+                    if (height > MAX_HEIGHT) {
+                        width *= MAX_HEIGHT / height;
+                        height = MAX_HEIGHT;
+                    }
+                }
+                
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                
+                const compressedBase64 = canvas.toDataURL('image/jpeg', 0.75);
+                
+                customImages[currentCategory] = compressedBase64;
+                localStorage.setItem('visionBoardImages', JSON.stringify(customImages));
+                
+                globalFileInput.value = ''; // Сброс инпута
+                initAllGrids();
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    });
 
     window.toggleTask = function(index) {
         allTodos[currentCategory][index].completed = !allTodos[currentCategory][index].completed;
@@ -413,7 +650,7 @@
         [...page1Categories, ...page2Categories].forEach(cat => {
             total += (allTodos[cat.id] || []).filter(t => !t.completed).length;
         });
-        alert(`Всего активных задач во всех сферах: ${total}`);
+        alert(`Всего активных целей: ${total}`);
     });
 
     document.getElementById('navHome').addEventListener('click', () => {
@@ -431,27 +668,24 @@
     });
 
     document.getElementById('navReset').addEventListener('click', () => {
-        if (confirm("Удалить ВСЕ задачи из ВСЕХ сфер?")) {
+        if (confirm("Очистить все данные и сбросить картинки?")) {
             allTodos = {};
-            saveData();
+            customImages = {};
+            localStorage.removeItem('visionBoardTodosScroll');
+            localStorage.removeItem('visionBoardImages');
             boardsViewport.scrollTop = 0;
             goHome();
         }
     });
 
     backBtn.addEventListener('click', goHome);
-    addTaskBtn.addEventListener('click', addTask);
-    taskInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') addTask();
-    });
 
     initAllGrids();
 
-    // Регистрация Сервис-Воркера для PWA работы офлайн
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('sw.js')
-        .then(() => console.log('PWA Service Worker зарегистрирован успешно!'))
-        .catch(err => console.log('Ошибка регистрации воркера:', err));
+        .then(() => console.log('PWA OK'))
+        .catch(err => console.log('PWA ERR', err));
     }
 </script>
 
