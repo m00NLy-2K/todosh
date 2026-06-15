@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>My Vision Board</title>
+    <title>Premium Vision Board</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -11,19 +11,20 @@
     
     <style>
         :root {
-            --primary-color: #C5D0E6; 
-            --bg-color: #F8FAFC;       
+            --bg-color: #F6F8FA;       
             --card-bg: #FFFFFF;
-            --text-main: #0F172A;      
-            --text-muted: #94A3B8;
-            --border-color: #E2E8F0;
+            --text-main: #1D1D1F;      
+            --text-muted: #86868B;
+            --border-color: #E5E5EA;
+            --accent: #007AFF;
+            --danger: #FF3B30;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', Roboto, sans-serif;
             -webkit-user-select: none;
             user-select: none;
         }
@@ -42,164 +43,187 @@
             display: flex;
             flex-direction: column;
             position: relative;
-            background-color: var(--bg-color);
         }
 
         .header {
             background-color: var(--bg-color);
-            padding: 55px 24px 16px;
-            text-align: center;
+            padding: 60px 24px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
             position: relative;
             z-index: 10;
         }
 
-        .back-btn {
-            position: absolute;
-            left: 24px;
-            top: 55px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            display: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .back-btn svg {
-            width: 24px;
-            height: 24px;
-            stroke: var(--text-main);
-            fill: none;
-            stroke-width: 2.5;
-        }
-
-        .add-action-btn {
-            position: absolute;
-            right: 24px;
-            top: 55px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            display: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .add-action-btn svg {
-            width: 24px;
-            height: 24px;
-            stroke: var(--text-main);
-            fill: none;
-            stroke-width: 2.5;
+        .header-left {
+            display: flex;
+            flex-direction: column;
         }
 
         .header h1 {
-            font-size: 20px;
-            font-weight: 800;
-            letter-spacing: -0.3px;
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
             color: var(--text-main);
-            text-transform: uppercase;
-            padding: 0 40px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
 
         .header .subtitle {
-            font-size: 11px;
-            margin-top: 4px;
-            font-weight: 700;
+            font-size: 12px;
+            margin-top: 2px;
+            font-weight: 600;
             color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 1.5px;
+            letter-spacing: 0.5px;
         }
 
-        .boards-viewport {
+        .header-actions {
+            display: flex;
+            gap: 16px;
+        }
+
+        .header-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            -webkit-tap-highlight-color: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .header-btn svg {
+            width: 24px;
+            height: 24px;
+            stroke: var(--text-main);
+            fill: none;
+            stroke-width: 2;
+            transition: stroke 0.2s;
+        }
+        .header-btn.active svg {
+            stroke: var(--accent);
+        }
+
+        /* Сетка категорий */
+        .main-viewport {
             flex: 1;
-            overflow-y: scroll;
-            scroll-snap-type: y mandatory;
-            scroll-behavior: smooth;
-            padding-bottom: 110px;
+            overflow-y: auto;
+            padding: 8px 24px 120px;
             -webkit-overflow-scrolling: touch;
         }
-
-        .boards-viewport::-webkit-scrollbar {
+        .main-viewport::-webkit-scrollbar {
             display: none;
         }
 
-        .grid-page {
-            height: 100%;
-            min-height: 100%;
-            scroll-snap-align: start;
+        .categories-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(3, 1fr);
-            gap: 12px;
-            padding: 10px 20px 20px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+            position: relative;
         }
 
         .grid-item {
-            border-radius: 20px;
-            padding: 14px 8px;
+            background-color: var(--card-bg);
+            border-radius: 18px;
+            padding: 20px 16px;
+            min-height: 125px;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
+            justify-content: space-between;
+            align-items: flex-start;
             position: relative;
-            background-size: cover;
-            background-position: center;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+            border: 1px solid rgba(0,0,0,0.03);
             -webkit-tap-highlight-color: transparent;
+            touch-action: auto;
         }
 
-        .grid-item::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.6));
-            z-index: 1;
+        /* Визуальный стиль режима редактирования структур */
+        .edit-mode-active .grid-item:not(.add-btn-card) {
+            border: 1.5px dashed var(--text-muted);
+            cursor: grab;
         }
 
-        .grid-item:active {
-            transform: scale(0.94);
+        /* Состояние перетаскиваемой карточки */
+        .grid-item.dragging {
+            position: fixed !important;
+            z-index: 1000 !important;
+            box-shadow: 0 16px 36px rgba(0,0,0,0.15) !important;
+            transform: scale(1.05);
+            opacity: 0.9;
+            pointer-events: none;
+            cursor: grabbing;
+        }
+
+        /* Пустой слот-ориентир на сетке */
+        .grid-item-placeholder {
+            background: rgba(0, 0, 0, 0.03);
+            border: 2px dashed var(--border-color);
+            border-radius: 18px;
+            min-height: 125px;
         }
 
         .grid-text {
-            color: #FFFFFF;
-            font-size: 11px;
+            font-size: 15px;
             font-weight: 700;
-            line-height: 1.3;
-            letter-spacing: 0.2px;
-            text-transform: uppercase;
-            z-index: 2;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            line-height: 1.35;
+            word-break: break-word;
+            padding-right: 14px;
         }
 
         .badge {
+            background-color: rgba(0,0,0,0.06);
+            color: var(--text-main);
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+            margin-top: 12px;
+        }
+
+        /* Кнопка удаления сферы (видна только при редактировании) */
+        .delete-cat-btn {
+            display: none;
             position: absolute;
             top: 10px;
             right: 10px;
-            background-color: var(--primary-color);
-            color: var(--text-main);
-            font-size: 10px;
-            min-width: 18px;
-            height: 18px;
-            padding: 0 4px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid var(--border-color);
+            color: var(--danger);
+            font-size: 16px;
+            font-weight: bold;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
-            font-weight: 800;
-            display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 2;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            cursor: pointer;
+            z-index: 6;
+        }
+        .edit-mode-active .delete-cat-btn {
+            display: flex;
         }
 
+        /* Карточка создания новой сферы */
+        .grid-item.add-btn-card {
+            border: 1px dashed var(--text-muted);
+            background: transparent !important;
+            box-shadow: none;
+            justify-content: center;
+            align-items: center;
+        }
+        .grid-item.add-btn-card .grid-text {
+            color: var(--text-muted);
+            font-weight: 600;
+            padding-right: 0;
+        }
+
+        /* Списки целей и планов */
         .task-container {
             display: none;
             flex-direction: column;
             flex: 1;
-            padding: 10px 24px 24px;
+            padding: 8px 24px 120px;
             overflow-y: auto;
-            padding-bottom: 110px;
         }
 
         .task-list {
@@ -210,60 +234,58 @@
             display: flex;
             align-items: flex-start;
             justify-content: space-between;
-            padding: 16px;
-            background-color: var(--card-bg);
-            border-radius: 20px;
-            margin-bottom: 12px;
+            padding: 18px 0;
+            border-bottom: 1px solid var(--border-color);
             gap: 14px;
-            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.02);
-            border: 1px solid rgba(0,0,0,0.02);
         }
 
-        .task-item.completed {
-            opacity: 0.4;
-        }
         .task-item.completed .task-text {
             text-decoration: line-through;
             color: var(--text-muted);
         }
         .task-item.completed .task-media {
-            filter: grayscale(1);
+            opacity: 0.5;
         }
 
         .task-body {
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
+        }
+
+        .task-main-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
             cursor: pointer;
         }
 
         .task-text {
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 600;
             line-height: 1.4;
         }
 
         .task-media {
             width: 100%;
-            max-height: 260px; /* Немного увеличили высоту для лучшего обзора качественных фото */
+            max-height: 280px;
             object-fit: cover;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
+            border-radius: 14px;
             display: block;
+            margin-top: 4px;
         }
 
         .custom-checkbox {
             width: 22px;
             height: 22px;
-            border: 2px solid var(--primary-color);
-            border-radius: 50%;
+            border: 2px solid var(--text-muted);
+            border-radius: 6px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background 0.2s, border-color 0.2s;
-            margin-top: 2px;
+            margin-top: 1px;
             flex-shrink: 0;
         }
         .task-item.completed .custom-checkbox {
@@ -274,7 +296,7 @@
             content: "";
             width: 5px;
             height: 9px;
-            border: solid white;
+            border: solid var(--card-bg);
             border-width: 0 2px 2px 0;
             transform: rotate(45deg);
             margin-bottom: 2px;
@@ -284,22 +306,103 @@
             display: block;
         }
 
-        .delete-task-btn {
+        /* Блок пошагового плана действий */
+        .action-plan-box {
+            margin-left: 34px;
+            margin-top: 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: calc(100% - 34px);
+        }
+        .plan-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .sub-step-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+        .sub-step-checkbox {
+            width: 16px;
+            height: 16px;
+            border: 1.5px solid var(--text-muted);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .sub-step-item.sub-completed .sub-step-checkbox {
+            background-color: var(--text-muted);
+            border-color: var(--text-muted);
+        }
+        .sub-step-checkbox::after {
+            content: "";
+            width: 3px;
+            height: 6px;
+            border: solid var(--card-bg);
+            border-width: 0 1.5px 1.5px 0;
+            transform: rotate(45deg);
+            margin-bottom: 1px;
+            display: none;
+        }
+        .sub-step-item.sub-completed .sub-step-checkbox::after {
+            display: block;
+        }
+        .sub-step-text {
+            font-size: 13px;
+            color: #48484A;
+            font-weight: 500;
+        }
+        .sub-step-item.sub-completed .sub-step-text {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        /* Блок кнопок управления внутри задачи (Редактирование и Удаление) */
+        .task-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            align-self: flex-start;
+            margin-top: 2px;
+        }
+        .edit-task-btn, .delete-task-btn {
             background: none;
             border: none;
             color: var(--text-muted);
-            font-size: 22px;
-            padding: 0 4px;
             cursor: pointer;
-            flex-shrink: 0;
-            margin-top: -2px;
+            padding: 0 4px;
+            transition: color 0.15s, transform 0.1s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .edit-task-btn {
+            font-size: 16px;
+        }
+        .delete-task-btn {
+            font-size: 22px;
+        }
+        .edit-task-btn:active, .delete-task-btn:active {
+            transform: scale(0.85);
+        }
+        .edit-task-btn:hover {
+            color: var(--accent);
+        }
+        .delete-task-btn:hover {
+            color: var(--danger);
         }
 
-        /* Action Sheet */
+        /* Контекстные листы и меню */
         .action-sheet-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(15, 23, 42, 0.4);
+            background: rgba(0,0,0,0.25);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
             display: flex;
@@ -307,7 +410,7 @@
             z-index: 100;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.25s ease;
+            transition: opacity 0.2s ease;
         }
         .action-sheet-overlay.active {
             opacity: 1;
@@ -316,11 +419,10 @@
         .action-sheet {
             width: 100%;
             background: var(--card-bg);
-            border-radius: 28px 28px 0 0;
-            padding: 24px 24px 44px;
+            border-radius: 24px 24px 0 0;
+            padding: 20px 24px 44px;
             transform: translateY(100%);
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.1);
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .action-sheet-overlay.active .action-sheet {
             transform: translateY(0);
@@ -330,40 +432,34 @@
             font-weight: 700;
             color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 1px;
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
         .action-sheet-btn {
             width: 100%;
-            padding: 16px;
+            padding: 15px;
             background: var(--bg-color);
-            border: none;
-            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
             font-size: 16px;
             font-weight: 600;
             color: var(--text-main);
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             text-align: center;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
             -webkit-tap-highlight-color: transparent;
         }
         .action-sheet-btn.cancel {
             background: transparent;
-            color: #EF4444;
-            margin-bottom: 0;
-            margin-top: 10px;
+            border: none;
+            color: var(--danger);
         }
 
-        /* Кастомное модальное окно для ввода текста целей */
+        /* Модальные окна */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(15, 23, 42, 0.4);
+            background: rgba(0,0,0,0.25);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
             display: flex;
@@ -372,7 +468,7 @@
             z-index: 110;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.2s ease;
+            transition: opacity 0.15s ease;
             padding: 24px;
         }
         .modal-overlay.active {
@@ -383,41 +479,50 @@
             width: 100%;
             max-width: 340px;
             background: var(--card-bg);
-            border-radius: 24px;
+            border-radius: 20px;
             padding: 24px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-            transform: scale(0.9);
-            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: scale(0.95);
+            transition: transform 0.15s ease;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.1);
         }
         .modal-overlay.active .modal-content {
             transform: scale(1);
         }
         .modal-title {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 700;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             text-align: center;
         }
         .modal-subtitle {
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-muted);
             margin-bottom: 16px;
             text-align: center;
         }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
         .modal-input {
             width: 100%;
-            padding: 14px;
+            padding: 12px 14px;
             background: var(--bg-color);
             border: 1px solid var(--border-color);
-            border-radius: 12px;
-            font-size: 16px;
+            border-radius: 10px;
+            font-size: 15px;
             color: var(--text-main);
             outline: none;
             -webkit-user-select: text;
             user-select: text;
         }
         .modal-input:focus {
-            border-color: #A5B4FC;
+            border-color: var(--accent);
+        }
+        .modal-textarea {
+            resize: none;
+            height: 70px;
         }
         .modal-buttons {
             display: flex;
@@ -428,7 +533,7 @@
             flex: 1;
             padding: 12px;
             border: none;
-            border-radius: 12px;
+            border-radius: 10px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
@@ -439,36 +544,37 @@
         }
         .modal-btn.save {
             background: var(--text-main);
-            color: #FFFFFF;
+            color: var(--card-bg);
         }
 
+        /* Навигация */
         .bottom-nav {
             position: absolute;
-            bottom: 30px;
+            bottom: 24px;
             left: 24px;
             right: 24px;
             background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 18px;
+            border: 1px solid var(--border-color);
             display: flex;
             justify-content: space-around;
             align-items: center;
             padding: 12px;
-            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
             z-index: 10;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.04);
         }
 
         .nav-item {
             background: none;
             border: none;
-            padding: 8px;
-            border-radius: 12px;
+            padding: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
             -webkit-tap-highlight-color: transparent;
+            position: relative; /* Необходимо для абсолютного позиционирования тултипа */
         }
         .nav-item svg {
             width: 22px;
@@ -476,6 +582,33 @@
             stroke: var(--text-main);
             fill: none;
             stroke-width: 2;
+        }
+
+        /* Премиальный механизм мини-обозначений (Тултипы) */
+        .nav-item::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 135%; /* Выталкиваем подсказку наверх над панелью */
+            left: 50%;
+            transform: translateX(-50%) translateY(6px);
+            background-color: var(--text-main);
+            color: var(--card-bg);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 5px 10px;
+            border-radius: 8px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            transition: opacity 0.15s cubic-bezier(0.4, 0, 0.2, 1), transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+        }
+
+        /* Анимация проявления при наведении */
+        .nav-item:hover::after {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
         }
     </style>
 </head>
@@ -485,19 +618,25 @@
 
 <div class="app-container">
     <header class="header">
-        <button class="back-btn" id="backBtn">
-            <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-        </button>
-        <h1 id="mainTitle">MY VISION BOARD</h1>
-        <button class="add-action-btn" id="addActionBtn">
-            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        </button>
-        <div class="subtitle" id="subTitle">СТРАНИЦА 1</div>
+        <div class="header-left">
+            <h1 id="mainTitle">BOARD</h1>
+            <div class="subtitle" id="subTitle">СФЕРЫ ЖИЗНИ</div>
+        </div>
+        <div class="header-actions">
+            <button class="header-btn" id="editOrderBtn" title="Изменить порядок (Перетаскивание)">
+                <svg viewBox="0 0 24 24"><path d="M11 5h10M11 12h10M11 19h10M3 6l3-3 3 3M6 3v18M3 18l3 3 3-3"/></svg>
+            </button>
+            <button class="header-btn" id="backBtn" style="display:none;">
+                <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
+            <button class="header-btn" id="addActionBtn" style="display:none;">
+                <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+        </div>
     </header>
 
-    <div class="boards-viewport" id="boardsViewport">
-        <div class="grid-page" id="page1"></div>
-        <div class="grid-page" id="page2"></div>
+    <div class="main-viewport" id="mainViewport">
+        <div class="categories-grid" id="categoriesGrid"></div>
     </div>
 
     <div class="task-container" id="taskContainer">
@@ -506,18 +645,23 @@
 
     <div class="action-sheet-overlay" id="actionSheetOverlay">
         <div class="action-sheet">
-            <div class="action-sheet-title" id="actionSheetTitle">Действия с целью</div>
-            <button class="action-sheet-btn" id="actionAddText">📝 Добавить текстовую цель</button>
-            <button class="action-sheet-btn" id="actionUploadPhoto">📸 Загрузить фото к цели</button>
+            <div class="action-sheet-title" id="actionSheetTitle">Новая цель</div>
+            <button class="action-sheet-btn" id="actionAddText">📝 Обычная цель с планом</button>
+            <button class="action-sheet-btn" id="actionUploadPhoto">📸 Визуализация (Фото + План)</button>
             <button class="action-sheet-btn cancel" id="actionCancel">Отмена</button>
         </div>
     </div>
 
     <div class="modal-overlay" id="inputModalOverlay">
         <div class="modal-content">
-            <div class="modal-title" id="modalTitleText">Новая цель</div>
-            <div class="modal-subtitle" id="modalSubtitleText">Что вы хотите реализовать?</div>
-            <input type="text" class="modal-input" id="modalTextInput" placeholder="Введите текст сюда..." maxlength="120">
+            <div class="modal-title" id="modalTitleText">Новый раздел</div>
+            <div class="modal-subtitle" id="modalSubtitleText">Заполните поля ниже</div>
+            
+            <div class="input-group">
+                <input type="text" class="modal-input" id="modalTextInput" placeholder="..." maxlength="100">
+                <textarea class="modal-input modal-textarea" id="modalPlanInput" placeholder="План действий: Шаг 1, Шаг 2, Шаг 3 (через запятую)..." style="display:none;"></textarea>
+            </div>
+
             <div class="modal-buttons">
                 <button class="modal-btn cancel" id="modalCancelBtn">Отмена</button>
                 <button class="modal-btn save" id="modalSaveBtn">Сохранить</button>
@@ -526,57 +670,51 @@
     </div>
 
     <nav class="bottom-nav">
-        <button class="nav-item" id="navInfo">
-            <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-        </button>
-        <button class="nav-item" id="navHome">
+        <button class="nav-item" id="navHome" data-tooltip="Главный экран">
             <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
         </button>
-        <button class="nav-item" id="navClear">
+        <button class="nav-item" id="navClear" data-tooltip="Очистить выполненные">
             <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
         </button>
-        <button class="nav-item" id="navReset">
+        <button class="nav-item" id="navReset" data-tooltip="Сбросить все данные">
             <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
         </button>
     </nav>
 </div>
 
 <script>
-    const page1Categories = [
-        { id: "wealth", title: "Богатство", img: "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?q=80&w=500&auto=format&fit=crop" },
-        { id: "fame", title: "Слава", img: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=500&auto=format&fit=crop" },
-        { id: "love", title: "Любовь", img: "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?q=80&w=500&auto=format&fit=crop" },
-        { id: "family", title: "Семья", img: "https://images.unsplash.com/photo-1609234656388-0ff363383899?q=80&w=500&auto=format&fit=crop" },
-        { id: "health", title: "Здоровье", img: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?q=80&w=500&auto=format&fit=crop" },
-        { id: "creativity", title: "Творчество", img: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?q=80&w=500&auto=format&fit=crop" },
-        { id: "knowledge", title: "Знания", img: "https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?q=80&w=500&auto=format&fit=crop" },
-        { id: "career", title: "Карьера", img: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=500&auto=format&fit=crop" },
-        { id: "travel", title: "Путешествия", img: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?q=80&w=500&auto=format&fit=crop" }
+    // Начальные премиальные категории
+    const defaultCategories = [
+        { id: "cat_wealth", title: "Богатство и Успех", color: "#FFF9E6" },
+        { id: "cat_health", title: "Здоровье и Спорт", color: "#E6F7ED" },
+        { id: "cat_family", title: "Семья и Отношения", color: "#FCE8E6" },
+        { id: "cat_career", title: "Карьера и Бизнес", color: "#E6F0FA" },
+        { id: "cat_travel", title: "Путешествия", color: "#EAF2F8" },
+        { id: "cat_growth", title: "Саморазвитие", color: "#F5E6FA" }
     ];
 
-    const page2Categories = [
-        { id: "rest", title: "Отдых", img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=500&auto=format&fit=crop" },
-        { id: "habits", title: "Привычки", img: "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?q=80&w=500&auto=format&fit=crop" },
-        { id: "spirit", title: "Дух", img: "https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?q=80&w=500&auto=format&fit=crop" },
-        { id: "shopping", title: "Покупки", img: "https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=500&auto=format&fit=crop" },
-        { id: "pets", title: "Питомцы", img: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=500&auto=format&fit=crop" },
-        { id: "goals", title: "Цели", img: "https://images.unsplash.com/photo-1517842645767-c639042777db?q=80&w=500&auto=format&fit=crop" },
-        { id: "sport", title: "Спорт", img: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=500&auto=format&fit=crop" },
-        { id: "friends", title: "Друзья", img: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?q=80&w=500&auto=format&fit=crop" },
-        { id: "home", title: "Дом", img: "https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=500&auto=format&fit=crop" }
-    ];
-
-    let allTodos = JSON.parse(localStorage.getItem('visionBoardTodosScroll')) || {};
+    let categories = JSON.parse(localStorage.getItem('premiumCategoriesList')) || defaultCategories;
+    let allTodos = JSON.parse(localStorage.getItem('premiumBoardTodos')) || {};
+    
     let currentCategory = null;
     let pendingImageBase64 = null;
+    let modalMode = "category"; 
+    let editingTodoIndex = null;
+    let isEditMode = false;
 
-    const boardsViewport = document.getElementById('boardsViewport');
-    const page1Container = document.getElementById('page1');
-    const page2Container = document.getElementById('page2');
+    // Глобальные переменные для Drag-and-Drop механики
+    let dragItem = null;
+    let placeholder = null;
+    let startX = 0, startY = 0;
+    let initialLeft = 0, initialTop = 0;
+
+    const mainViewport = document.getElementById('mainViewport');
+    const categoriesGrid = document.getElementById('categoriesGrid');
     const taskContainer = document.getElementById('taskContainer');
     
     const backBtn = document.getElementById('backBtn');
     const addActionBtn = document.getElementById('addActionBtn');
+    const editOrderBtn = document.getElementById('editOrderBtn');
     const mainTitle = document.getElementById('mainTitle');
     const subTitle = document.getElementById('subTitle');
     const taskList = document.getElementById('taskList');
@@ -592,43 +730,175 @@
     const modalTitleText = document.getElementById('modalTitleText');
     const modalSubtitleText = document.getElementById('modalSubtitleText');
     const modalTextInput = document.getElementById('modalTextInput');
+    const modalPlanInput = document.getElementById('modalPlanInput');
     const modalCancelBtn = document.getElementById('modalCancelBtn');
     const modalSaveBtn = document.getElementById('modalSaveBtn');
 
-    function renderPageGrid(container, categoriesList) {
-        container.innerHTML = '';
-        categoriesList.forEach(cat => {
-            const activeTasksCount = (allTodos[cat.id] || []).filter(t => !t.completed).length;
+    // Отрисовка главной сетки сфер
+    function renderCategoriesGrid() {
+        categoriesGrid.innerHTML = '';
+        if (isEditMode) {
+            categoriesGrid.classList.add('edit-mode-active');
+            editOrderBtn.classList.add('active');
+        } else {
+            categoriesGrid.classList.remove('edit-mode-active');
+            editOrderBtn.classList.remove('active');
+        }
+        
+        categories.forEach((cat) => {
+            const activeCount = (allTodos[cat.id] || []).filter(t => !t.completed).length;
             const item = document.createElement('div');
             item.className = 'grid-item';
-            item.style.backgroundImage = `url('${cat.img}')`;
-            item.onclick = () => openCategory(cat);
+            item.style.backgroundColor = cat.color || '#FFFFFF';
+            item.dataset.id = cat.id;
+            
+            item.onclick = (e) => {
+                if (isEditMode || e.target.classList.contains('delete-cat-btn')) return;
+                openCategory(cat);
+            };
+
             item.innerHTML = `
-                <div class="badge" id="badge-${cat.id}" style="display: ${activeTasksCount > 0 ? 'flex' : 'none'}">${activeTasksCount}</div>
+                <button class="delete-cat-btn" onclick="deleteCategory('${cat.id}', event)">&times;</button>
                 <div class="grid-text">${cat.title}</div>
+                <div class="badge">${activeCount} активных</div>
             `;
-            container.appendChild(item);
+
+            item.addEventListener('pointerdown', (e) => handlePointerDown(e, item));
+            categoriesGrid.appendChild(item);
         });
+
+        // Карточка создания новой сферы
+        const addCard = document.createElement('div');
+        addCard.className = 'grid-item add-btn-card';
+        addCard.onclick = () => {
+            if (isEditMode) toggleEditMode();
+            modalMode = "category";
+            modalPlanInput.style.display = "none";
+            modalTextInput.value = "";
+            modalPlanInput.value = "";
+            openInputModal("Новая сфера", "Какое направление вы хотите добавить?", "Например: Духовный рост, Хобби...");
+        };
+        addCard.innerHTML = `<div class="grid-text">+ Создать сферу</div>`;
+        categoriesGrid.appendChild(addCard);
     }
 
-    function initAllGrids() {
-        renderPageGrid(page1Container, page1Categories);
-        renderPageGrid(page2Container, page2Categories);
+    // --- Механизм Drag-and-Drop Сортировки ---
+    function handlePointerDown(e, item) {
+        if (!isEditMode) return;
+        if (e.target.closest('.delete-cat-btn')) return;
+
+        dragItem = item;
+        const rect = dragItem.getBoundingClientRect();
+        
+        placeholder = document.createElement('div');
+        placeholder.className = 'grid-item-placeholder';
+        placeholder.style.width = rect.width + 'px';
+        placeholder.style.height = rect.height + 'px';
+        
+        startX = e.clientX;
+        startY = e.clientY;
+        initialLeft = rect.left;
+        initialTop = rect.top;
+        
+        dragItem.style.touchAction = 'none';
+        dragItem.style.width = rect.width + 'px';
+        dragItem.style.height = rect.height + 'px';
+        dragItem.style.left = initialLeft + 'px';
+        dragItem.style.top = initialTop + 'px';
+        dragItem.classList.add('dragging');
+        
+        dragItem.parentNode.insertBefore(placeholder, dragItem);
+        document.body.appendChild(dragItem);
+        
+        dragItem.setPointerCapture(e.pointerId);
+        
+        dragItem.addEventListener('pointermove', handlePointerMove);
+        dragItem.addEventListener('pointerup', handlePointerUp);
+        dragItem.addEventListener('pointercancel', handlePointerUp);
     }
 
-    boardsViewport.addEventListener('scroll', () => {
-        if (currentCategory) return;
-        const viewHeight = boardsViewport.clientHeight;
-        const pageIndex = Math.round(boardsViewport.scrollTop / viewHeight) + 1;
-        subTitle.textContent = `СТРАНИЦА ${pageIndex}`;
-    });
+    function handlePointerMove(e) {
+        if (!dragItem) return;
+        
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        
+        dragItem.style.left = (initialLeft + dx) + 'px';
+        dragItem.style.top = (initialTop + dy) + 'px';
+        
+        const elementUnder = document.elementFromPoint(e.clientX, e.clientY);
+        if (!elementUnder) return;
+        
+        const targetCard = elementUnder.closest('.grid-item:not(.dragging):not(.add-btn-card)');
+        
+        if (targetCard && targetCard !== placeholder) {
+            const children = Array.from(categoriesGrid.children);
+            const placeholderIndex = children.indexOf(placeholder);
+            const targetIndex = children.indexOf(targetCard);
+            
+            if (placeholderIndex < targetIndex) {
+                categoriesGrid.insertBefore(placeholder, targetCard.nextSibling);
+            } else {
+                categoriesGrid.insertBefore(placeholder, targetCard);
+            }
+        }
+    }
+
+    function handlePointerUp(e) {
+        if (!dragItem) return;
+        
+        dragItem.removeEventListener('pointermove', handlePointerMove);
+        dragItem.removeEventListener('pointerup', handlePointerUp);
+        dragItem.removeEventListener('pointercancel', handlePointerUp);
+        
+        dragItem.releasePointerCapture(e.pointerId);
+        
+        dragItem.classList.remove('dragging');
+        dragItem.style.width = '';
+        dragItem.style.height = '';
+        dragItem.style.left = '';
+        dragItem.style.top = '';
+        dragItem.style.touchAction = 'auto';
+        
+        if (placeholder && placeholder.parentNode) {
+            placeholder.parentNode.insertBefore(dragItem, placeholder);
+            placeholder.remove();
+        }
+        
+        dragItem = null;
+        placeholder = null;
+        
+        updateCategoriesOrderFromDOM();
+    }
+
+    function updateCategoriesOrderFromDOM() {
+        const currentDOMItems = Array.from(categoriesGrid.querySelectorAll('.grid-item:not(.add-btn-card)'));
+        const newOrderedArray = [];
+        
+        currentDOMItems.forEach(domItem => {
+            const catId = domItem.dataset.id;
+            const foundObj = categories.find(c => c.id === catId);
+            if (foundObj) newOrderedArray.push(foundObj);
+        });
+        
+        categories = newOrderedArray;
+        saveData();
+    }
+
+    function toggleEditMode() {
+        isEditMode = !isEditMode;
+        renderCategoriesGrid();
+    }
+
+    editOrderBtn.addEventListener('click', toggleEditMode);
 
     function openCategory(cat) {
         currentCategory = cat.id;
-        boardsViewport.style.display = 'none';
+        mainViewport.style.display = 'none';
         taskContainer.style.display = 'flex';
         backBtn.style.display = 'block';
         addActionBtn.style.display = 'block';
+        editOrderBtn.style.display = 'none';
         mainTitle.textContent = cat.title;
         subTitle.textContent = "План реализации";
         actionSheetTitle.textContent = cat.title;
@@ -637,34 +907,88 @@
 
     function goHome() {
         currentCategory = null;
-        boardsViewport.style.display = 'block';
+        mainViewport.style.display = 'block';
         taskContainer.style.display = 'none';
         backBtn.style.display = 'none';
         addActionBtn.style.display = 'none';
-        mainTitle.textContent = "MY VISION BOARD";
-        const viewHeight = boardsViewport.clientHeight;
-        subTitle.textContent = `СТРАНИЦА ${Math.round(boardsViewport.scrollTop / viewHeight) + 1}`;
-        initAllGrids();
+        editOrderBtn.style.display = 'block';
+        mainTitle.textContent = "BOARD";
+        subTitle.textContent = "СФЕРЫ ЖИЗНИ";
+        renderCategoriesGrid();
     }
 
+    function deleteCategory(id, event) {
+        if (event) event.stopPropagation();
+        if (confirm("Удалить эту сферу и все цели внутри нее?")) {
+            categories = categories.filter(c => c.id !== id);
+            delete allTodos[id];
+            saveData();
+            renderCategoriesGrid();
+        }
+    }
+
+    // Списки целей и вложенных планов реализации
     function renderTasks() {
         taskList.innerHTML = '';
         const tasks = allTodos[currentCategory] || [];
-        tasks.forEach((task, index) => {
+        
+        tasks.forEach((task, tIndex) => {
             const li = document.createElement('li');
             li.className = `task-item ${task.completed ? 'completed' : ''}`;
             
+            let planHtml = '';
+            if (task.steps && task.steps.length > 0) {
+                planHtml = `<div class="action-plan-box"><div class="plan-title">План реализации:</div>`;
+                task.steps.forEach((step, sIndex) => {
+                    planHtml += `
+                        <div class="sub-step-item ${step.completed ? 'sub-completed' : ''}" onclick="toggleSubStep(${tIndex}, ${sIndex}, event)">
+                            <div class="sub-step-checkbox"></div>
+                            <span class="sub-step-text">${step.text}</span>
+                        </div>
+                    `;
+                });
+                planHtml += `</div>`;
+            }
+
             li.innerHTML = `
-                <div class="custom-checkbox" onclick="toggleTask(${index})"></div>
-                <div class="task-body" onclick="toggleTask(${index})">
-                    ${task.text ? `<span class="task-text">${task.text}</span>` : ''}
-                    ${task.image ? `<img src="${task.image}" class="task-media" alt="Фото цели">` : ''}
+                <div class="task-body">
+                    <div class="task-main-row">
+                        <div class="custom-checkbox" onclick="toggleTask(${tIndex})"></div>
+                        <div style="flex:1;" onclick="toggleTask(${tIndex})">
+                            ${task.text ? `<span class="task-text">${task.text}</span>` : ''}
+                            ${task.image ? `<img src="${task.image}" class="task-media" alt="Фото">` : ''}
+                        </div>
+                    </div>
+                    ${planHtml}
                 </div>
-                <button class="delete-task-btn" onclick="deleteTask(${index})">&times;</button>
+                <div class="task-actions">
+                    <button class="edit-task-btn" onclick="openEditTaskModal(${tIndex})" title="Редактировать">✎</button>
+                    <button class="delete-task-btn" onclick="deleteTask(${tIndex})" title="Удалить">&times;</button>
+                </div>
             `;
             taskList.appendChild(li);
         });
     }
+
+    window.openEditTaskModal = function(index) {
+        modalMode = "edit-todo";
+        editingTodoIndex = index;
+        const task = allTodos[currentCategory][index];
+        
+        modalPlanInput.style.display = "block";
+        modalTextInput.value = task.text || "";
+        modalPlanInput.value = task.steps ? task.steps.map(s => s.text).join(', ') : "";
+        
+        openInputModal("Редактировать цель", "Измените описание или шаги плана:", "Например: Купить машину");
+    };
+
+    window.toggleSubStep = function(tIndex, sIndex, event) {
+        event.stopPropagation(); 
+        const task = allTodos[currentCategory][tIndex];
+        task.steps[sIndex].completed = !task.steps[sIndex].completed;
+        saveData();
+        renderTasks();
+    };
 
     addActionBtn.addEventListener('click', () => {
         actionSheetOverlay.classList.add('active');
@@ -679,11 +1003,10 @@
     });
     actionCancel.addEventListener('click', closeActionSheet);
 
-    function openInputModal(title, subtitle, placeholder = "Напишите цель...") {
+    function openInputModal(title, subtitle, placeholderText) {
         modalTitleText.textContent = title;
         modalSubtitleText.textContent = subtitle;
-        modalTextInput.placeholder = placeholder;
-        modalTextInput.value = "";
+        modalTextInput.placeholder = placeholderText;
         inputModalOverlay.classList.add('active');
         setTimeout(() => modalTextInput.focus(), 150);
     }
@@ -698,8 +1021,12 @@
     actionAddText.addEventListener('click', () => {
         closeActionSheet();
         pendingImageBase64 = null;
+        modalMode = "todo";
+        modalPlanInput.style.display = "block";
+        modalTextInput.value = "";
+        modalPlanInput.value = "";
         setTimeout(() => {
-            openInputModal("Новая цель", "Запишите то, к чему стремитесь:", "Например: Купить билеты в Рим");
+            openInputModal("Новая цель", "Опишите цель и шаги к ней через запятую (необязательно):", "Например: Купить машину");
         }, 200);
     });
 
@@ -708,7 +1035,6 @@
         globalFileInput.click();
     });
 
-    // Измененный скрипт: Ослабленное мягкое сжатие для высокой четкости
     globalFileInput.addEventListener('change', (event) => {
         const file = event.target.files[0];
         if (!file || !currentCategory) return;
@@ -718,22 +1044,15 @@
             const img = new Image();
             img.onload = function() {
                 const canvas = document.createElement('canvas');
-                // Увеличили разрешение до HD-качества (1200px вместо 480px)
                 const MAX_WIDTH = 1200;
                 const MAX_HEIGHT = 1200;
                 let width = img.width;
                 let height = img.height;
 
                 if (width > height) {
-                    if (width > MAX_WIDTH) {
-                        height *= MAX_WIDTH / width;
-                        width = MAX_WIDTH;
-                    }
+                    if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
                 } else {
-                    if (height > MAX_HEIGHT) {
-                        width *= MAX_HEIGHT / height;
-                        height = MAX_HEIGHT;
-                    }
+                    if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
                 }
                 
                 canvas.width = width;
@@ -741,10 +1060,13 @@
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, width, height);
                 
-                // Подняли качество сжатия до 85% — фото будет максимально четким
                 pendingImageBase64 = canvas.toDataURL('image/jpeg', 0.85);
                 
-                openInputModal("Визуализация цели", "Добавьте описание к фото (необязательно):", "Например: Машина мечты...");
+                modalMode = "todo";
+                modalPlanInput.style.display = "block";
+                modalTextInput.value = "";
+                modalPlanInput.value = "";
+                openInputModal("Визуализация цели", "Опишите картинку и шаги плана через запятую:", "Например: Поездка к морю");
                 globalFileInput.value = '';
             };
             img.src = e.target.result;
@@ -753,30 +1075,69 @@
     });
 
     modalSaveBtn.addEventListener('click', () => {
-        const text = modalTextInput.value.trim();
+        const textVal = modalTextInput.value.trim();
+        const planVal = modalPlanInput.value.trim();
         
-        if (!text && !pendingImageBase64) {
+        if (modalMode === "category") {
+            if (!textVal) return closeInputModal();
+            const colors = ["#FFF9E6", "#E6F7ED", "#FCE8E6", "#E6F0FA", "#EAF2F8", "#F5E6FA"];
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            
+            categories.push({
+                id: "custom_" + Date.now(),
+                title: textVal,
+                color: randomColor
+            });
+            saveData();
+            renderCategoriesGrid();
             closeInputModal();
-            return;
-        }
+        } else if (modalMode === "todo") {
+            if (!textVal && !pendingImageBase64) return closeInputModal();
+            
+            let parsedSteps = [];
+            if (planVal) {
+                parsedSteps = planVal.split(',')
+                    .map(step => step.trim())
+                    .filter(step => step.length > 0)
+                    .map(step => ({ text: step, completed: false }));
+            }
 
-        if (!allTodos[currentCategory]) allTodos[currentCategory] = [];
-        
-        allTodos[currentCategory].push({
-            text: text,
-            image: pendingImageBase64,
-            completed: false
-        });
+            if (!allTodos[currentCategory]) allTodos[currentCategory] = [];
+            allTodos[currentCategory].push({
+                text: textVal,
+                image: pendingImageBase64,
+                steps: parsedSteps,
+                completed: false
+            });
+            
+            saveData();
+            renderTasks();
+            closeInputModal();
+            pendingImageBase64 = null;
+        } else if (modalMode === "edit-todo") {
+            const currentTasks = allTodos[currentCategory] || [];
+            if (!textVal && !currentTasks[editingTodoIndex].image) return closeInputModal();
+            
+            const oldTask = currentTasks[editingTodoIndex];
+            
+            let parsedSteps = [];
+            if (planVal) {
+                parsedSteps = planVal.split(',')
+                    .map(step => step.trim())
+                    .filter(step => step.length > 0)
+                    .map(step => {
+                        const oldStep = oldTask.steps ? oldTask.steps.find(s => s.text === step) : null;
+                        return { text: step, completed: oldStep ? oldStep.completed : false };
+                    });
+            }
 
-        saveData();
-        renderTasks();
-        closeInputModal();
-        pendingImageBase64 = null;
-    });
-
-    modalTextInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            modalSaveBtn.click();
+            oldTask.text = textVal;
+            oldTask.steps = parsedSteps;
+            
+            saveData();
+            renderTasks();
+            closeInputModal();
+            editingTodoIndex = null;
         }
     });
 
@@ -787,30 +1148,25 @@
     };
 
     window.deleteTask = function(index) {
-        allTodos[currentCategory].splice(index, 1);
-        saveData();
-        renderTasks();
+        if (confirm("Удалить эту цель?")) {
+            allTodos[currentCategory].splice(index, 1);
+            saveData();
+            renderTasks();
+        }
     };
 
     function saveData() {
-        localStorage.setItem('visionBoardTodosScroll', JSON.stringify(allTodos));
+        localStorage.setItem('premiumCategoriesList', JSON.stringify(categories));
+        localStorage.setItem('premiumBoardTodos', JSON.stringify(allTodos));
     }
 
-    document.getElementById('navInfo').addEventListener('click', () => {
-        let total = 0;
-        [...page1Categories, ...page2Categories].forEach(cat => {
-            total += (allTodos[cat.id] || []).filter(t => !t.completed).length;
-        });
-        alert(`Всего активных целей: ${total}`);
-    });
-
     document.getElementById('navHome').addEventListener('click', () => {
-        boardsViewport.scrollTop = 0;
+        if (isEditMode) toggleEditMode();
         goHome();
     });
 
     document.getElementById('navClear').addEventListener('click', () => {
-        if (!currentCategory) return alert("Сначала откройте любую сферу!");
+        if (!currentCategory) return alert("Сначала откройте какую-либо сферу!");
         if (allTodos[currentCategory]) {
             allTodos[currentCategory] = allTodos[currentCategory].filter(t => !t.completed);
             saveData();
@@ -819,16 +1175,18 @@
     });
 
     document.getElementById('navReset').addEventListener('click', () => {
-        if (confirm("Очистить все цели и фотографии?")) {
+        if (confirm("Сбросить приложение? Это сотрет все созданные разделы, фотографии и выстроенный вами порядок.")) {
+            localStorage.removeItem('premiumCategoriesList');
+            localStorage.removeItem('premiumBoardTodos');
+            categories = defaultCategories;
             allTodos = {};
-            localStorage.removeItem('visionBoardTodosScroll');
-            boardsViewport.scrollTop = 0;
+            isEditMode = false;
             goHome();
         }
     });
 
     backBtn.addEventListener('click', goHome);
-    initAllGrids();
+    renderCategoriesGrid();
 
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('sw.js')
