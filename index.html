@@ -45,7 +45,6 @@
             background-color: var(--bg-color);
         }
 
-        /* Нативная шапка с кнопками управления */
         .header {
             background-color: var(--bg-color);
             padding: 55px 24px 16px;
@@ -72,7 +71,6 @@
             stroke-width: 2.5;
         }
 
-        /* Новая кнопка Плюс в шапке */
         .add-action-btn {
             position: absolute;
             right: 24px;
@@ -195,7 +193,6 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
 
-        /* Контейнер списка задач без лишних полей ввода */
         .task-container {
             display: none;
             flex-direction: column;
@@ -211,29 +208,49 @@
 
         .task-item {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: space-between;
             padding: 16px;
             background-color: var(--card-bg);
-            border-radius: 16px;
-            margin-bottom: 10px;
+            border-radius: 20px;
+            margin-bottom: 12px;
             gap: 14px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.01);
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.02);
             border: 1px solid rgba(0,0,0,0.02);
         }
 
         .task-item.completed {
-            opacity: 0.5;
+            opacity: 0.4;
         }
         .task-item.completed .task-text {
             text-decoration: line-through;
             color: var(--text-muted);
         }
+        .task-item.completed .task-media {
+            filter: grayscale(1);
+        }
+
+        .task-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            cursor: pointer;
+        }
 
         .task-text {
-            flex: 1;
             font-size: 15px;
-            font-weight: 500;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .task-media {
+            width: 100%;
+            max-height: 220px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            display: block;
         }
 
         .custom-checkbox {
@@ -246,6 +263,8 @@
             align-items: center;
             justify-content: center;
             transition: background 0.2s, border-color 0.2s;
+            margin-top: 2px;
+            flex-shrink: 0;
         }
         .task-item.completed .custom-checkbox {
             background-color: var(--text-main);
@@ -269,11 +288,14 @@
             background: none;
             border: none;
             color: var(--text-muted);
-            font-size: 20px;
+            font-size: 22px;
             padding: 0 4px;
+            cursor: pointer;
+            flex-shrink: 0;
+            margin-top: -2px;
         }
 
-        /* Стильный выезжающий снизу Action Sheet (Нативное меню) */
+        /* Нативное выезжающее меню (Action Sheet) */
         .action-sheet-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -337,6 +359,89 @@
             margin-top: 10px;
         }
 
+        /* НОВОЕ: Стильное кастомное модальное окно для ввода текста целей */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 110;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+            padding: 24px;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-content {
+            width: 100%;
+            max-width: 340px;
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            transform: scale(0.9);
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+        .modal-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            text-align: center;
+        }
+        .modal-subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        .modal-input {
+            width: 100%;
+            padding: 14px;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 16px; /* 16px предотвращает автозум экрана в iOS Safari */
+            color: var(--text-main);
+            outline: none;
+            -webkit-user-select: text;
+            user-select: text;
+        }
+        .modal-input:focus {
+            border-color: #A5B4FC;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .modal-btn.cancel {
+            background: var(--bg-color);
+            color: var(--text-muted);
+        }
+        .modal-btn.save {
+            background: var(--text-main);
+            color: #FFFFFF;
+        }
+
         .bottom-nav {
             position: absolute;
             bottom: 30px;
@@ -376,7 +481,6 @@
 </head>
 <body>
 
-<!-- Скрытый системный инпут для загрузки медиа -->
 <input type="file" id="globalFileInput" accept="image/*" style="display:none;">
 
 <div class="app-container">
@@ -400,13 +504,24 @@
         <ul class="task-list" id="taskList"></ul>
     </div>
 
-    <!-- Компонент Action Sheet -->
     <div class="action-sheet-overlay" id="actionSheetOverlay">
         <div class="action-sheet">
             <div class="action-sheet-title" id="actionSheetTitle">Действия с целью</div>
-            <button class="action-sheet-btn" id="actionAddText">📝 Добавить задачу (текст)</button>
-            <button class="action-sheet-btn" id="actionUploadPhoto">🖼️ Загрузить новое фото цели</button>
+            <button class="action-sheet-btn" id="actionAddText">📝 Добавить текстовую цель</button>
+            <button class="action-sheet-btn" id="actionUploadPhoto">📸 Загрузить фото к цели</button>
             <button class="action-sheet-btn cancel" id="actionCancel">Отмена</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="inputModalOverlay">
+        <div class="modal-content">
+            <div class="modal-title" id="modalTitleText">Новая цель</div>
+            <div class="modal-subtitle" id="modalSubtitleText">Что вы хотите реализовать?</div>
+            <input type="text" class="modal-input" id="modalTextInput" placeholder="Введите текст сюда..." maxlength="120">
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" id="modalCancelBtn">Отмена</button>
+                <button class="modal-btn save" id="modalSaveBtn">Сохранить</button>
+            </div>
         </div>
     </div>
 
@@ -452,22 +567,20 @@
     ];
 
     let allTodos = JSON.parse(localStorage.getItem('visionBoardTodosScroll')) || {};
-    let customImages = JSON.parse(localStorage.getItem('visionBoardImages')) || {};
     let currentCategory = null;
+    let pendingImageBase64 = null; // Для временного хранения фото перед сохранением
 
     const boardsViewport = document.getElementById('boardsViewport');
     const page1Container = document.getElementById('page1');
     const page2Container = document.getElementById('page2');
     const taskContainer = document.getElementById('taskContainer');
     
-    // Элементы управления шапки
     const backBtn = document.getElementById('backBtn');
     const addActionBtn = document.getElementById('addActionBtn');
     const mainTitle = document.getElementById('mainTitle');
     const subTitle = document.getElementById('subTitle');
     const taskList = document.getElementById('taskList');
 
-    // Элементы Action Sheet
     const actionSheetOverlay = document.getElementById('actionSheetOverlay');
     const actionSheetTitle = document.getElementById('actionSheetTitle');
     const actionAddText = document.getElementById('actionAddText');
@@ -475,16 +588,21 @@
     const actionCancel = document.getElementById('actionCancel');
     const globalFileInput = document.getElementById('globalFileInput');
 
+    // Элементы нового красивого окна ввода
+    const inputModalOverlay = document.getElementById('inputModalOverlay');
+    const modalTitleText = document.getElementById('modalTitleText');
+    const modalSubtitleText = document.getElementById('modalSubtitleText');
+    const modalTextInput = document.getElementById('modalTextInput');
+    const modalCancelBtn = document.getElementById('modalCancelBtn');
+    const modalSaveBtn = document.getElementById('modalSaveBtn');
+
     function renderPageGrid(container, categoriesList) {
         container.innerHTML = '';
         categoriesList.forEach(cat => {
             const activeTasksCount = (allTodos[cat.id] || []).filter(t => !t.completed).length;
             const item = document.createElement('div');
             item.className = 'grid-item';
-            
-            const currentBg = customImages[cat.id] || cat.img;
-            item.style.backgroundImage = `url('${currentBg}')`;
-            
+            item.style.backgroundImage = `url('${cat.img}')`;
             item.onclick = () => openCategory(cat);
             item.innerHTML = `
                 <div class="badge" id="badge-${cat.id}" style="display: ${activeTasksCount > 0 ? 'flex' : 'none'}">${activeTasksCount}</div>
@@ -510,11 +628,8 @@
         currentCategory = cat.id;
         boardsViewport.style.display = 'none';
         taskContainer.style.display = 'flex';
-        
-        // Показываем стрелку назад и плюс в шапке
         backBtn.style.display = 'block';
         addActionBtn.style.display = 'block';
-        
         mainTitle.textContent = cat.title;
         subTitle.textContent = "План реализации";
         actionSheetTitle.textContent = cat.title;
@@ -525,11 +640,8 @@
         currentCategory = null;
         boardsViewport.style.display = 'block';
         taskContainer.style.display = 'none';
-        
-        // Скрываем кнопки управления шапки
         backBtn.style.display = 'none';
         addActionBtn.style.display = 'none';
-        
         mainTitle.textContent = "MY VISION BOARD";
         const viewHeight = boardsViewport.clientHeight;
         subTitle.textContent = `СТРАНИЦА ${Math.round(boardsViewport.scrollTop / viewHeight) + 1}`;
@@ -542,16 +654,20 @@
         tasks.forEach((task, index) => {
             const li = document.createElement('li');
             li.className = `task-item ${task.completed ? 'completed' : ''}`;
+            
             li.innerHTML = `
                 <div class="custom-checkbox" onclick="toggleTask(${index})"></div>
-                <span class="task-text" onclick="toggleTask(${index})">${task.text}</span>
+                <div class="task-body" onclick="toggleTask(${index})">
+                    ${task.text ? `<span class="task-text">${task.text}</span>` : ''}
+                    ${task.image ? `<img src="${task.image}" class="task-media" alt="Фото цели">` : ''}
+                </div>
                 <button class="delete-task-btn" onclick="deleteTask(${index})">&times;</button>
             `;
             taskList.appendChild(li);
         });
     }
 
-    // Управление меню (Action Sheet)
+    // Управление контекстным меню
     addActionBtn.addEventListener('click', () => {
         actionSheetOverlay.classList.add('active');
     });
@@ -565,26 +681,39 @@
     });
     actionCancel.addEventListener('click', closeActionSheet);
 
-    // Выбор: Добавить текст
+    // Управление красивым окном ввода (Взамен prompt)
+    function openInputModal(title, subtitle, placeholder = "Напишите цель...") {
+        modalTitleText.textContent = title;
+        modalSubtitleText.textContent = subtitle;
+        modalTextInput.placeholder = placeholder;
+        modalTextInput.value = "";
+        inputModalOverlay.classList.add('active');
+        setTimeout(() => modalTextInput.focus(), 150); // автофокус на ввод
+    }
+
+    function closeInputModal() {
+        inputModalOverlay.classList.remove('active');
+        modalTextInput.blur();
+    }
+
+    modalCancelBtn.addEventListener('click', closeInputModal);
+
+    // Клик на «Добавить текстовую цель»
     actionAddText.addEventListener('click', () => {
         closeActionSheet();
+        pendingImageBase64 = null; // фото нет, только текст
         setTimeout(() => {
-            const text = prompt("Введите новую задачу/цель:");
-            if (!text || !text.trim()) return;
-            if (!allTodos[currentCategory]) allTodos[currentCategory] = [];
-            allTodos[currentCategory].push({ text: text.trim(), completed: false });
-            saveData();
-            renderTasks();
-        }, 300); // Таймаут для плавной анимации скрытия меню
+            openInputModal("Новая цель", "Запишите то, к чему стремитесь:", "Например: Купить билеты в Рим");
+        }, 200);
     });
 
-    // Выбор: Загрузить фото
+    // Клик на «Загрузить фото к цели»
     actionUploadPhoto.addEventListener('click', () => {
         closeActionSheet();
         globalFileInput.click();
     });
 
-    // Логика сжатия и сохранения картинки
+    // Обработка загрузки, сжатия фото и вызов окна для подписи
     globalFileInput.addEventListener('change', (event) => {
         const file = event.target.files[0];
         if (!file || !currentCategory) return;
@@ -594,8 +723,8 @@
             const img = new Image();
             img.onload = function() {
                 const canvas = document.createElement('canvas');
-                const MAX_WIDTH = 450;
-                const MAX_HEIGHT = 450;
+                const MAX_WIDTH = 480;
+                const MAX_HEIGHT = 480;
                 let width = img.width;
                 let height = img.height;
 
@@ -616,17 +745,48 @@
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, width, height);
                 
-                const compressedBase64 = canvas.toDataURL('image/jpeg', 0.75);
+                // Сжимаем до web-формата, чтобы не перегружать память
+                pendingImageBase64 = canvas.toDataURL('image/jpeg', 0.70);
                 
-                customImages[currentCategory] = compressedBase64;
-                localStorage.setItem('visionBoardImages', JSON.stringify(customImages));
-                
-                globalFileInput.value = ''; // Сброс инпута
-                initAllGrids();
+                // Открываем модальное окно для подписи фото цели
+                openInputModal("Визуализация цели", "Добавьте описание к фото (необязательно):", "Например: Отель моей мечты...");
+                globalFileInput.value = ''; // сброс
             };
             img.src = e.target.result;
         };
         reader.readAsDataURL(file);
+    });
+
+    // Кнопка «Сохранить» в модальном окне ввода
+    modalSaveBtn.addEventListener('click', () => {
+        const text = modalTextInput.value.trim();
+        
+        // Если нет ни текста, ни фото — ничего не сохраняем
+        if (!text && !pendingImageBase64) {
+            closeInputModal();
+            return;
+        }
+
+        if (!allTodos[currentCategory]) allTodos[currentCategory] = [];
+        
+        // Пушим новую цель в массив
+        allTodos[currentCategory].push({
+            text: text,
+            image: pendingImageBase64,
+            completed: false
+        });
+
+        saveData();
+        renderTasks();
+        closeInputModal();
+        pendingImageBase64 = null; // очищаем буфер
+    });
+
+    // Сохранение по нажатию Enter на клавиатуре
+    modalTextInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            modalSaveBtn.click();
+        }
     });
 
     window.toggleTask = function(index) {
@@ -668,18 +828,15 @@
     });
 
     document.getElementById('navReset').addEventListener('click', () => {
-        if (confirm("Очистить все данные и сбросить картинки?")) {
+        if (confirm("Очистить все цели и фотографии?")) {
             allTodos = {};
-            customImages = {};
             localStorage.removeItem('visionBoardTodosScroll');
-            localStorage.removeItem('visionBoardImages');
             boardsViewport.scrollTop = 0;
             goHome();
         }
     });
 
     backBtn.addEventListener('click', goHome);
-
     initAllGrids();
 
     if ('serviceWorker' in navigator) {
