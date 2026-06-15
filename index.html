@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>My Vision Board</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Vision Board">
+    
+    <style>
+        :root {
+            --primary-color: #C5D0E6; 
+            --bg-color: #f8f9fa;
+            --text-dark: #2c3e50;
+            --text-muted: #7f8c8d;
+            --border-color: #e2e8f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        body, html {
+            background-color: white;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* Адаптировано под чистый полноэкранный режим смартфона */
+        .app-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            background-color: white;
+        }
+
+        .header {
+            background-color: var(--primary-color);
+            color: var(--text-dark);
+            padding: 45px 20px 20px;
+            text-align: center;
+            position: relative;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            z-index: 10;
+        }
+
+        .back-btn {
+            position: absolute;
+            left: 20px;
+            top: 45px;
+            font-size: 22px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-dark);
+            display: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .header .subtitle {
+            font-size: 16px;
+            margin-top: 4px;
+            font-weight: bold;
+            opacity: 0.8;
+        }
+
+        .boards-viewport {
+            flex: 1;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+            padding-bottom: 90px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .boards-viewport::-webkit-scrollbar {
+            display: none;
+        }
+
+        .grid-page {
+            height: 100%;
+            min-height: 100%;
+            scroll-snap-align: start;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 12px;
+            padding: 20px;
+        }
+
+        .grid-item {
+            background-color: var(--primary-color);
+            border-radius: 18px;
+            padding: 10px 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .icon {
+            font-size: 28px;
+            margin-bottom: 6px;
+        }
+
+        .grid-text {
+            color: var(--text-dark);
+            font-size: 10px;
+            font-weight: 700;
+            line-height: 1.2;
+            text-transform: uppercase;
+        }
+
+        .badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background-color: #ff5e5e;
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: bold;
+            display: none;
+        }
+
+        .task-container {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            padding-bottom: 90px;
+        }
+
+        .input-area {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .input-area input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 15px;
+            outline: none;
+            -webkit-user-select: text;
+            user-select: text;
+        }
+
+        .input-area input:focus {
+            border-color: var(--primary-color);
+        }
+
+        .input-area button {
+            background-color: var(--primary-color);
+            border: none;
+            width: 45px;
+            border-radius: 12px;
+            font-size: 20px;
+            color: var(--text-dark);
+            font-weight: bold;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .task-list {
+            list-style: none;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            background-color: var(--bg-color);
+            border-radius: 10px;
+            margin-bottom: 8px;
+            gap: 10px;
+        }
+
+        .task-item.completed .task-text {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        .task-text {
+            flex: 1;
+            font-size: 15px;
+            color: var(--text-dark);
+        }
+
+        .task-checkbox {
+            width: 18px;
+            height: 18px;
+        }
+
+        .delete-task-btn {
+            background: none;
+            border: none;
+            color: #ff5c5c;
+            font-size: 18px;
+        }
+
+        .bottom-nav {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 25px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            z-index: 10;
+        }
+
+        .nav-item {
+            font-size: 22px;
+            background: none;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 10px;
+            -webkit-tap-highlight-color: transparent;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <header class="header">
+        <button class="back-btn" id="backBtn">←</button>
+        <h1 id="mainTitle">MY VISION BOARD</h1>
+        <div class="subtitle" id="subTitle">1</div>
+    </header>
+
+    <div class="boards-viewport" id="boardsViewport">
+        <div class="grid-page" id="page1"></div>
+        <div class="grid-page" id="page2"></div>
+    </div>
+
+    <div class="task-container" id="taskContainer">
+        <div class="input-area">
+            <input type="text" id="taskInput" placeholder="Добавить новую задачу..." autocomplete="off">
+            <button id="addTaskBtn">+</button>
+        </div>
+        <ul class="task-list" id="taskList"></ul>
+    </div>
+
+    <nav class="bottom-nav">
+        <button class="nav-item" id="navInfo">🔔</button>
+        <button class="nav-item" id="navHome">🎛️</button>
+        <button class="nav-item" id="navClear">🎯</button>
+        <button class="nav-item" id="navReset">🔗</button>
+    </nav>
+</div>
+
+<script>
+    const page1Categories = [
+        { id: "wealth", icon: "💰", title: "Процветание и богатство" },
+        { id: "fame", icon: "🌿", title: "Репутация и слава" },
+        { id: "love", icon: "💍", title: "Любовь и брак" },
+        { id: "family", icon: "☕", title: "Общество и семья" },
+        { id: "health", icon: "📸", title: "Мое фото и здоровье" },
+        { id: "creativity", icon: "🎨", title: "Творчество и дети" },
+        { id: "knowledge", icon: "📚", title: "Образование и знания" },
+        { id: "career", icon: "💼", title: "Карьера и миссия" },
+        { id: "travel", icon: "⛵", title: "Путешествия и менторы" }
+    ];
+
+    const page2Categories = [
+        { id: "rest", icon: "🌴", title: "Отдых и отпуск" },
+        { id: "habits", icon: "⏰", title: "Привычки и рутина" },
+        { id: "spirit", icon: "🧘", title: "Духовный рост" },
+        { id: "shopping", icon: "🛒", title: "Покупки и быт" },
+        { id: "pets", icon: "🐾", title: "Домашние питомцы" },
+        { id: "goals", icon: "🎯", title: "Главные цели" },
+        { id: "sport", icon: "🏃", title: "Спорт и тонус" },
+        { id: "friends", icon: "🥳", title: "Друзья и тусовки" },
+        { id: "home", icon: "🏡", title: "Уют и дом" }
+    ];
+
+    let allTodos = JSON.parse(localStorage.getItem('visionBoardTodosScroll')) || {};
+    let currentCategory = null;
+
+    const boardsViewport = document.getElementById('boardsViewport');
+    const page1Container = document.getElementById('page1');
+    const page2Container = document.getElementById('page2');
+    const taskContainer = document.getElementById('taskContainer');
+    const backBtn = document.getElementById('backBtn');
+    const mainTitle = document.getElementById('mainTitle');
+    const subTitle = document.getElementById('subTitle');
+    const taskInput = document.getElementById('taskInput');
+    const addTaskBtn = document.getElementById('addTaskBtn');
+    const taskList = document.getElementById('taskList');
+
+    function renderPageGrid(container, categoriesList) {
+        container.innerHTML = '';
+        categoriesList.forEach(cat => {
+            const activeTasksCount = (allTodos[cat.id] || []).filter(t => !t.completed).length;
+            const item = document.createElement('div');
+            item.className = 'grid-item';
+            item.onclick = () => openCategory(cat);
+            item.innerHTML = `
+                <div class="badge" id="badge-${cat.id}" style="display: ${activeTasksCount > 0 ? 'block' : 'none'}">${activeTasksCount}</div>
+                <div class="icon">${cat.icon}</div>
+                <div class="grid-text">${cat.title}</div>
+            `;
+            container.appendChild(item);
+        });
+    }
+
+    function initAllGrids() {
+        renderPageGrid(page1Container, page1Categories);
+        renderPageGrid(page2Container, page2Categories);
+    }
+
+    boardsViewport.addEventListener('scroll', () => {
+        if (currentCategory) return;
+        const viewHeight = boardsViewport.clientHeight;
+        const pageIndex = Math.round(boardsViewport.scrollTop / viewHeight) + 1;
+        subTitle.textContent = pageIndex;
+    });
+
+    function openCategory(cat) {
+        currentCategory = cat.id;
+        boardsViewport.style.display = 'none';
+        taskContainer.style.display = 'flex';
+        backBtn.style.display = 'block';
+        mainTitle.textContent = cat.title;
+        subTitle.textContent = "Список дел";
+        renderTasks();
+    }
+
+    function goHome() {
+        currentCategory = null;
+        boardsViewport.style.display = 'block';
+        taskContainer.style.display = 'none';
+        backBtn.style.display = 'none';
+        mainTitle.textContent = "MY VISION BOARD";
+        const viewHeight = boardsViewport.clientHeight;
+        subTitle.textContent = Math.round(boardsViewport.scrollTop / viewHeight) + 1;
+        initAllGrids();
+    }
+
+    function renderTasks() {
+        taskList.innerHTML = '';
+        const tasks = allTodos[currentCategory] || [];
+        tasks.forEach((task, index) => {
+            const li = document.createElement('li');
+            li.className = `task-item ${task.completed ? 'completed' : ''}`;
+            li.innerHTML = `
+                <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask(${index})">
+                <span class="task-text" onclick="toggleTask(${index})">${task.text}</span>
+                <button class="delete-task-btn" onclick="deleteTask(${index})">&times;</button>
+            `;
+            taskList.appendChild(li);
+        });
+    }
+
+    function addTask() {
+        const text = taskInput.value.trim();
+        if (!text || !currentCategory) return;
+        if (!allTodos[currentCategory]) allTodos[currentCategory] = [];
+        allTodos[currentCategory].push({ text: text, completed: false });
+        taskInput.value = '';
+        saveData();
+        renderTasks();
+    }
+
+    window.toggleTask = function(index) {
+        allTodos[currentCategory][index].completed = !allTodos[currentCategory][index].completed;
+        saveData();
+        renderTasks();
+    };
+
+    window.deleteTask = function(index) {
+        allTodos[currentCategory].splice(index, 1);
+        saveData();
+        renderTasks();
+    };
+
+    function saveData() {
+        localStorage.setItem('visionBoardTodosScroll', JSON.stringify(allTodos));
+    }
+
+    document.getElementById('navInfo').addEventListener('click', () => {
+        let total = 0;
+        [...page1Categories, ...page2Categories].forEach(cat => {
+            total += (allTodos[cat.id] || []).filter(t => !t.completed).length;
+        });
+        alert(`Всего активных задач во всех сферах: ${total}`);
+    });
+
+    document.getElementById('navHome').addEventListener('click', () => {
+        boardsViewport.scrollTop = 0;
+        goHome();
+    });
+
+    document.getElementById('navClear').addEventListener('click', () => {
+        if (!currentCategory) return alert("Сначала откройте любую сферу!");
+        if (allTodos[currentCategory]) {
+            allTodos[currentCategory] = allTodos[currentCategory].filter(t => !t.completed);
+            saveData();
+            renderTasks();
+        }
+    });
+
+    document.getElementById('navReset').addEventListener('click', () => {
+        if (confirm("Удалить ВСЕ задачи из ВСЕХ сфер?")) {
+            allTodos = {};
+            saveData();
+            boardsViewport.scrollTop = 0;
+            goHome();
+        }
+    });
+
+    backBtn.addEventListener('click', goHome);
+    addTaskBtn.addEventListener('click', addTask);
+    taskInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') addTask();
+    });
+
+    initAllGrids();
+
+    // Регистрация Сервис-Воркера для PWA работы офлайн
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js')
+        .then(() => console.log('PWA Service Worker зарегистрирован успешно!'))
+        .catch(err => console.log('Ошибка регистрации воркера:', err));
+    }
+</script>
+
+</body>
+</html>
