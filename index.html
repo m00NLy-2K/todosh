@@ -246,7 +246,7 @@
 
         .task-media {
             width: 100%;
-            max-height: 220px;
+            max-height: 260px; /* Немного увеличили высоту для лучшего обзора качественных фото */
             object-fit: cover;
             border-radius: 12px;
             border: 1px solid var(--border-color);
@@ -295,7 +295,7 @@
             margin-top: -2px;
         }
 
-        /* Нативное выезжающее меню (Action Sheet) */
+        /* Action Sheet */
         .action-sheet-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -359,7 +359,7 @@
             margin-top: 10px;
         }
 
-        /* НОВОЕ: Стильное кастомное модальное окно для ввода текста целей */
+        /* Кастомное модальное окно для ввода текста целей */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -410,7 +410,7 @@
             background: var(--bg-color);
             border: 1px solid var(--border-color);
             border-radius: 12px;
-            font-size: 16px; /* 16px предотвращает автозум экрана в iOS Safari */
+            font-size: 16px;
             color: var(--text-main);
             outline: none;
             -webkit-user-select: text;
@@ -568,7 +568,7 @@
 
     let allTodos = JSON.parse(localStorage.getItem('visionBoardTodosScroll')) || {};
     let currentCategory = null;
-    let pendingImageBase64 = null; // Для временного хранения фото перед сохранением
+    let pendingImageBase64 = null;
 
     const boardsViewport = document.getElementById('boardsViewport');
     const page1Container = document.getElementById('page1');
@@ -588,7 +588,6 @@
     const actionCancel = document.getElementById('actionCancel');
     const globalFileInput = document.getElementById('globalFileInput');
 
-    // Элементы нового красивого окна ввода
     const inputModalOverlay = document.getElementById('inputModalOverlay');
     const modalTitleText = document.getElementById('modalTitleText');
     const modalSubtitleText = document.getElementById('modalSubtitleText');
@@ -667,7 +666,6 @@
         });
     }
 
-    // Управление контекстным меню
     addActionBtn.addEventListener('click', () => {
         actionSheetOverlay.classList.add('active');
     });
@@ -681,14 +679,13 @@
     });
     actionCancel.addEventListener('click', closeActionSheet);
 
-    // Управление красивым окном ввода (Взамен prompt)
     function openInputModal(title, subtitle, placeholder = "Напишите цель...") {
         modalTitleText.textContent = title;
         modalSubtitleText.textContent = subtitle;
         modalTextInput.placeholder = placeholder;
         modalTextInput.value = "";
         inputModalOverlay.classList.add('active');
-        setTimeout(() => modalTextInput.focus(), 150); // автофокус на ввод
+        setTimeout(() => modalTextInput.focus(), 150);
     }
 
     function closeInputModal() {
@@ -698,22 +695,20 @@
 
     modalCancelBtn.addEventListener('click', closeInputModal);
 
-    // Клик на «Добавить текстовую цель»
     actionAddText.addEventListener('click', () => {
         closeActionSheet();
-        pendingImageBase64 = null; // фото нет, только текст
+        pendingImageBase64 = null;
         setTimeout(() => {
             openInputModal("Новая цель", "Запишите то, к чему стремитесь:", "Например: Купить билеты в Рим");
         }, 200);
     });
 
-    // Клик на «Загрузить фото к цели»
     actionUploadPhoto.addEventListener('click', () => {
         closeActionSheet();
         globalFileInput.click();
     });
 
-    // Обработка загрузки, сжатия фото и вызов окна для подписи
+    // Измененный скрипт: Ослабленное мягкое сжатие для высокой четкости
     globalFileInput.addEventListener('change', (event) => {
         const file = event.target.files[0];
         if (!file || !currentCategory) return;
@@ -723,8 +718,9 @@
             const img = new Image();
             img.onload = function() {
                 const canvas = document.createElement('canvas');
-                const MAX_WIDTH = 480;
-                const MAX_HEIGHT = 480;
+                // Увеличили разрешение до HD-качества (1200px вместо 480px)
+                const MAX_WIDTH = 1200;
+                const MAX_HEIGHT = 1200;
                 let width = img.width;
                 let height = img.height;
 
@@ -745,23 +741,20 @@
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, width, height);
                 
-                // Сжимаем до web-формата, чтобы не перегружать память
-                pendingImageBase64 = canvas.toDataURL('image/jpeg', 0.70);
+                // Подняли качество сжатия до 85% — фото будет максимально четким
+                pendingImageBase64 = canvas.toDataURL('image/jpeg', 0.85);
                 
-                // Открываем модальное окно для подписи фото цели
-                openInputModal("Визуализация цели", "Добавьте описание к фото (необязательно):", "Например: Отель моей мечты...");
-                globalFileInput.value = ''; // сброс
+                openInputModal("Визуализация цели", "Добавьте описание к фото (необязательно):", "Например: Машина мечты...");
+                globalFileInput.value = '';
             };
             img.src = e.target.result;
         };
         reader.readAsDataURL(file);
     });
 
-    // Кнопка «Сохранить» в модальном окне ввода
     modalSaveBtn.addEventListener('click', () => {
         const text = modalTextInput.value.trim();
         
-        // Если нет ни текста, ни фото — ничего не сохраняем
         if (!text && !pendingImageBase64) {
             closeInputModal();
             return;
@@ -769,7 +762,6 @@
 
         if (!allTodos[currentCategory]) allTodos[currentCategory] = [];
         
-        // Пушим новую цель в массив
         allTodos[currentCategory].push({
             text: text,
             image: pendingImageBase64,
@@ -779,10 +771,9 @@
         saveData();
         renderTasks();
         closeInputModal();
-        pendingImageBase64 = null; // очищаем буфер
+        pendingImageBase64 = null;
     });
 
-    // Сохранение по нажатию Enter на клавиатуре
     modalTextInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             modalSaveBtn.click();
