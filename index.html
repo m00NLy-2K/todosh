@@ -58,43 +58,42 @@
             position: relative;
         }
 
-        .header {
-            background-color: var(--bg-color);
-            padding: 50px 24px 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            position: relative;
-            z-index: 10;
-            transition: background-color 0.3s;
-        }
+            .header {
+        background-color: var(--bg-color);
+        padding: 50px 24px 16px;
+        /* Используем Grid вместо Flex */
+        display: grid;
+        grid-template-columns: 1fr auto; /* Заголовок занимает всё место, кнопки — только сколько нужно */
+        align-items: start;
+        gap: 10px; /* Отступ между текстом и кнопками */
+        position: relative;
+        z-index: 10;
+    }
 
-            .header-left {
+    .header-left {
         display: flex;
         flex-direction: column;
-        /* Указываем, что заголовок не должен выталкивать кнопки */
-        flex: 1; 
-        min-width: 0; 
-        overflow: hidden; /* Скрываем выход текста за границы */
-        margin-right: 10px; /* Добавляем небольшой отступ от кнопок справа */
+        min-width: 0; /* Важно: позволяет заголовку правильно сжиматься */
     }
 
     #mainTitle {
         font-size: 26px;
         font-weight: 700;
-        letter-spacing: -0.5px;
+        line-height: 1.1;
         color: var(--text-main);
-        /* Включаем обрезку длинного текста */
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        
+        word-wrap: break-word; /* Текст переносится на новую строку */
         cursor: pointer;
-        transition: opacity 0.15s;
-        display: inline-block;
-        align-self: flex-start;
-        -webkit-tap-highlight-color: transparent;
     }
+
+    .header-actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        /* Кнопки всегда остаются справа в своей колонке */
+        justify-self: end;
+        flex-shrink: 0;
+    }
+        
         #mainTitle:active {
             opacity: 0.6;
         }
@@ -106,14 +105,6 @@
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.5px;
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 16px;
-            align-items: center;
-            margin-bottom: 4px; 
-            flex-shrink: 0;
         }
 
         .header-btn {
