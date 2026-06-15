@@ -19,6 +19,17 @@
             --accent: #007AFF;
             --danger: #FF3B30;
             --success: #34C759;
+            --settings-btn-bg: #F2F2F7;
+        }
+
+        /* Стили для темной темы */
+        body.dark {
+            --bg-color: #1C1C1E;
+            --card-bg: #2C2C2E;
+            --text-main: #FFFFFF;
+            --text-muted: #8E8E93;
+            --border-color: #38383A;
+            --settings-btn-bg: #3A3A3C;
         }
 
         * {
@@ -36,6 +47,7 @@
             height: 100%;
             overflow: hidden;
             color: var(--text-main);
+            transition: background-color 0.3s, color 0.3s;
         }
 
         .app-container {
@@ -54,6 +66,7 @@
             align-items: flex-end;
             position: relative;
             z-index: 10;
+            transition: background-color 0.3s;
         }
 
         .header-left {
@@ -116,6 +129,9 @@
             stroke-width: 2;
             transition: stroke 0.2s, transform 0.2s;
         }
+        body.dark .header-btn svg {
+            stroke: var(--text-main);
+        }
         .header-btn.active svg {
             stroke: var(--accent);
         }
@@ -152,6 +168,13 @@
             border: 1px solid rgba(0,0,0,0.03);
             -webkit-tap-highlight-color: transparent;
             touch-action: auto;
+            transition: background-color 0.3s;
+        }
+
+        body.dark .grid-item {
+            /* Смягчение кастомных пастельных цветов в темной теме для комфорта глаз */
+            background-blend-mode: multiply;
+            background-color: rgba(255, 255, 255, 0.15) !important;
         }
 
         .edit-mode-active .grid-item:not(.add-btn-card) {
@@ -183,6 +206,7 @@
             line-height: 1.35;
             word-break: break-word;
             padding-right: 14px;
+            color: var(--text-main);
         }
 
         .badge {
@@ -193,6 +217,9 @@
             border-radius: 12px;
             font-weight: 600;
             margin-top: 12px;
+        }
+        body.dark .badge {
+            background-color: rgba(255,255,255,0.1);
         }
 
         .delete-cat-btn {
@@ -212,6 +239,9 @@
             justify-content: center;
             cursor: pointer;
             z-index: 6;
+        }
+        body.dark .delete-cat-btn {
+            background: rgba(44, 44, 46, 0.9);
         }
         .edit-mode-active .delete-cat-btn {
             display: flex;
@@ -380,12 +410,14 @@
         }
         .sub-step-text {
             font-size: 13px;
-            color: #48484A;
+            color: var(--text-main);
             font-weight: 500;
+            opacity: 0.9;
         }
         .sub-step-item.sub-completed .sub-step-text {
             text-decoration: line-through;
             color: var(--text-muted);
+            opacity: 1;
         }
 
         .task-actions {
@@ -434,6 +466,7 @@
             flex-direction: column;
             align-items: center;
             text-align: center;
+            transition: background-color 0.3s;
         }
         
         .profile-avatar {
@@ -533,9 +566,68 @@
             text-align: center;
             border: 1px solid rgba(0,0,0,0.02);
             box-shadow: 0 4px 12px rgba(0,0,0,0.01);
+            transition: background-color 0.3s;
         }
         .stat-summary-value { font-size: 26px; font-weight: 700; color: var(--text-main); }
         .stat-summary-label { font-size: 11px; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
+
+        /* БЛОК НАСТРОЕК В ПРОФИЛЕ (Новый) */
+        .settings-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(0,0,0,0.02);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.01);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: background-color 0.3s;
+        }
+        .settings-card-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        .settings-row-btn {
+            width: 100%;
+            background: var(--settings-btn-bg);
+            border: none;
+            border-radius: 12px;
+            padding: 14px 16px;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-main);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            transition: background-color 0.2s;
+        }
+        .settings-row-btn:active { opacity: 0.8; }
+        .settings-status { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+        
+        .backup-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .backup-btn {
+            background: var(--settings-btn-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
 
         .balance-card {
             background: var(--card-bg);
@@ -543,6 +635,7 @@
             padding: 20px;
             border: 1px solid rgba(0,0,0,0.02);
             box-shadow: 0 4px 12px rgba(0,0,0,0.01);
+            transition: background-color 0.3s;
         }
         .balance-card-title {
             font-size: 14px;
@@ -567,7 +660,6 @@
         .balance-progress-bg { height: 6px; background: var(--bg-color); border-radius: 100px; overflow: hidden; }
         .balance-progress-fill { height: 100%; border-radius: 100px; width: 0%; transition: width 0.4s ease; }
 
-        /* Маленькая аккуратная кнопка сброса в профиле */
         .profile-reset-btn {
             background: none;
             border: none;
@@ -690,6 +782,7 @@
 
 <input type="file" id="globalFileInput" accept="image/*" style="display:none;">
 <input type="file" id="avatarFileInput" accept="image/*" style="display:none;">
+<input type="file" id="backupFileInput" accept=".json" style="display:none;">
 
 <div class="app-container">
     <header class="header">
@@ -698,6 +791,9 @@
             <div class="subtitle" id="subTitle">СФЕРЫ ЖИЗНИ</div>
         </div>
         <div class="header-actions">
+            <button class="header-btn" id="themeToggleBtn" title="Сменить тему">
+                <svg id="themeIcon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </button>
             <button class="header-btn" id="historyBtn" style="display:none;" title="История выполненных">
                 <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
             </button>
@@ -716,17 +812,14 @@
         </div>
     </header>
 
-    <!-- 1. Главная лента сфер -->
     <div class="main-viewport" id="mainViewport">
         <div class="categories-grid" id="categoriesGrid"></div>
     </div>
 
-    <!-- 2. Экран списка целей -->
     <div class="task-container" id="taskContainer">
         <ul class="task-list" id="taskList"></ul>
     </div>
 
-    <!-- 3. Экран Личного Профиля -->
     <div class="profile-container" id="profileContainer">
         <div class="profile-main-card">
             <div class="profile-avatar" id="profileAvatar" title="Сменить аватар">
@@ -739,7 +832,7 @@
             </div>
             <div class="profile-rank" id="profileRank">Новичок фокуса</div>
             <div class="profile-motto-box" id="profileMottoBox">
-                <div class="profile-motto-label">Главный фокус года</div>
+                <div class="profile-motto-label">Главный фокус</div>
                 <div class="profile-motto-text" id="profileMottoText" style="opacity: 0.5;">Введите цель...</div>
             </div>
         </div>
@@ -755,6 +848,18 @@
             </div>
         </div>
 
+        <div class="settings-card">
+            <div class="settings-card-title">Система и Безопасность</div>
+            <button class="settings-row-btn" id="notificationToggleBtn">
+                <span>Напоминания о целях</span>
+                <span id="notificationStatusText" class="settings-status">Выкл</span>
+            </button>
+            <div class="backup-grid">
+                <button class="backup-btn" id="exportBackupBtn">Экспорт целей</button>
+                <button class="backup-btn" id="importBackupBtn">Импорт целей</button>
+            </div>
+        </div>
+
         <div class="balance-card">
             <div class="balance-card-title">Баланс жизненных сфер</div>
             <div id="balanceListContainer"></div>
@@ -763,7 +868,6 @@
         <button class="profile-reset-btn" id="profileResetBtn">Сбросить все данные приложения</button>
     </div>
 
-    <!-- Меню создания цели -->
     <div class="action-sheet-overlay" id="actionSheetOverlay">
         <div class="action-sheet">
             <div class="action-sheet-title" id="actionSheetTitle">Новая цель</div>
@@ -773,7 +877,6 @@
         </div>
     </div>
 
-    <!-- Модальное окно ввода -->
     <div class="modal-overlay" id="inputModalOverlay">
         <div class="modal-content">
             <div class="modal-title" id="modalTitleText">Новый раздел</div>
@@ -806,7 +909,6 @@
     let allTodos = JSON.parse(localStorage.getItem('premiumBoardTodos')) || {};
     let allArchive = JSON.parse(localStorage.getItem('premiumBoardArchive')) || {};
     
-    // Нейтральное стартовое состояние профиля без хардкода
     let userProfile = JSON.parse(localStorage.getItem('premiumUserProfile')) || {
         name: "",
         motto: "",
@@ -847,6 +949,7 @@
     const actionCancel = document.getElementById('actionCancel');
     const globalFileInput = document.getElementById('globalFileInput');
     const avatarFileInput = document.getElementById('avatarFileInput');
+    const backupFileInput = document.getElementById('backupFileInput');
 
     const inputModalOverlay = document.getElementById('inputModalOverlay');
     const modalTitleText = document.getElementById('modalTitleText');
@@ -855,6 +958,32 @@
     const modalPlanInput = document.getElementById('modalPlanInput');
     const modalCancelBtn = document.getElementById('modalCancelBtn');
     const modalSaveBtn = document.getElementById('modalSaveBtn');
+
+    // Логика переключения Темной Темы
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+    const themeIcon = document.getElementById('themeIcon');
+    let savedTheme = localStorage.getItem('premiumTheme') || 'light';
+    
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark');
+        updateThemeIcon(true);
+    }
+
+    themeToggleBtn.addEventListener('click', () => {
+        const isDarkNow = document.body.classList.toggle('dark');
+        localStorage.setItem('premiumTheme', isDarkNow ? 'dark' : 'light');
+        updateThemeIcon(isDarkNow);
+    });
+
+    function updateThemeIcon(isDark) {
+        if (isDark) {
+            // Иконка Солнца
+            themeIcon.innerHTML = `<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>`;
+        } else {
+            // Иконка Луны
+            themeIcon.innerHTML = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>`;
+        }
+    }
 
     mainTitle.addEventListener('click', () => {
         if (isEditMode) toggleEditMode();
@@ -1022,6 +1151,7 @@
         historyBtn.style.display = 'block'; 
         editOrderBtn.style.display = 'none';
         profileBtn.style.display = 'none';
+        themeToggleBtn.style.display = 'none';
         
         mainTitle.textContent = "BOARD";
         subTitle.textContent = "План реализации";
@@ -1043,6 +1173,7 @@
         historyBtn.style.display = 'none';
         editOrderBtn.style.display = 'none';
         profileBtn.style.display = 'none';
+        themeToggleBtn.style.display = 'none';
 
         subTitle.textContent = "Личная аналитика";
         renderProfileStats();
@@ -1062,6 +1193,7 @@
         historyBtn.style.display = 'none';
         editOrderBtn.style.display = 'block';
         profileBtn.style.display = 'block';
+        themeToggleBtn.style.display = 'flex';
         
         subTitle.textContent = "СФЕРЫ ЖИЗНИ";
         renderCategoriesGrid();
@@ -1074,10 +1206,8 @@
     });
 
     function renderProfileStats() {
-        // Рендеринг имени или нейтрального плейсхолдера
         document.getElementById('profileName').textContent = userProfile.name || "Профиль";
 
-        // Рендеринг фокуса/девиза с полупрозрачным шрифтом при пустом значении
         const mottoEl = document.getElementById('profileMottoText');
         if (userProfile.motto) {
             mottoEl.textContent = userProfile.motto;
@@ -1087,6 +1217,16 @@
             mottoEl.textContent = "Введите цель...";
             mottoEl.style.opacity = "0.4";
             mottoEl.style.fontStyle = "normal";
+        }
+
+        // Рендеринг статуса системных уведомлений
+        const statusTextEl = document.getElementById('notificationStatusText');
+        if ("Notification" in window && Notification.permission === "granted") {
+            statusTextEl.textContent = "Включены";
+            statusTextEl.style.color = "var(--success)";
+        } else {
+            statusTextEl.textContent = "Выкл";
+            statusTextEl.style.color = "var(--text-muted)";
         }
 
         const avatarContainer = document.getElementById('profileAvatar');
@@ -1144,6 +1284,81 @@
         else if (completedGoals >= 15) rank = "Магистр баланса 👑";
         document.getElementById('profileRank').textContent = rank;
     }
+
+    // Логика подсистемы локальных Push-уведомлений
+    document.getElementById('notificationToggleBtn').addEventListener('click', () => {
+        if (!("Notification" in window)) {
+            alert("Ваш браузер или устройство не поддерживает веб-уведомления.");
+            return;
+        }
+
+        Notification.requestPermission().then(permission => {
+            if (permission === "granted") {
+                new Notification("Фокус настроен", {
+                    body: "Уведомления успешно подключены. Мы будем напоминать вам о целях.",
+                    icon: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23007AFF'><circle cx='12' cy='12' r='10'/></svg>"
+                });
+            } else {
+                alert("Доступ к уведомлениям отклонен. Вы можете включить их в системных настройках браузера.");
+            }
+            renderProfileStats();
+        });
+    });
+
+    // Логика экспорта Резервной Копии (Бэкап в JSON)
+    document.getElementById('exportBackupBtn').addEventListener('click', () => {
+        const backupData = {
+            categories: categories,
+            allTodos: allTodos,
+            allArchive: allArchive,
+            userProfile: userProfile,
+            exportVersion: "2026.1"
+        };
+
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData));
+        const downloadAnchor = document.createElement('a');
+        downloadAnchor.setAttribute("href", dataStr);
+        downloadAnchor.setAttribute("download", "vision_board_backup.json");
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+    });
+
+    // Логика импорта Резервной Копии
+    document.getElementById('importBackupBtn').addEventListener('click', () => {
+        backupFileInput.click();
+    });
+
+    backupFileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            try {
+                const parsed = JSON.parse(event.target.result);
+                
+                if (parsed.categories && parsed.allTodos) {
+                    if (confirm("Вы уверены, что хотите развернуть эту резервную копию? Все текущие цели в приложении будут заменены.")) {
+                        categories = parsed.categories;
+                        allTodos = parsed.allTodos;
+                        allArchive = parsed.allArchive || {};
+                        userProfile = parsed.userProfile || { name: "", motto: "", avatar: "" };
+                        
+                        saveData();
+                        renderProfileStats();
+                        alert("Данные успешно импортированы!");
+                    }
+                } else {
+                    alert("Ошибка: Некорректная структура файла резервной копии.");
+                }
+            } catch (err) {
+                alert("Не удалось прочитать JSON-файл. Убедитесь, что файл не поврежден.");
+            }
+            backupFileInput.value = '';
+        };
+        reader.readAsText(file);
+    });
 
     function renderTasks() {
         taskList.innerHTML = '';
@@ -1478,6 +1693,8 @@
             allArchive = {};
             userProfile = { name: "", motto: "", avatar: "" };
             isEditMode = false; 
+            document.body.classList.remove('dark');
+            updateThemeIcon(false);
             goHome();
         }
     });
