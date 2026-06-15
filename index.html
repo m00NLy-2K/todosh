@@ -18,6 +18,7 @@
             --border-color: #E5E5EA;
             --accent: #007AFF;
             --danger: #FF3B30;
+            --success: #34C759;
         }
 
         * {
@@ -47,7 +48,7 @@
 
         .header {
             background-color: var(--bg-color);
-            padding: 60px 24px 16px;
+            padding: 50px 24px 16px;
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
@@ -76,9 +77,12 @@
             letter-spacing: 0.5px;
         }
 
+        /* Кнопки в хедере приподняты выше */
         .header-actions {
             display: flex;
             gap: 16px;
+            align-items: center;
+            margin-bottom: 4px; 
         }
 
         .header-btn {
@@ -137,14 +141,12 @@
             touch-action: auto;
         }
 
-        /* Визуальный стиль режима редактирования структур + ЗАПРЕТ Скролла со смартфона */
         .edit-mode-active .grid-item:not(.add-btn-card) {
             border: 1.5px dashed var(--text-muted);
             cursor: grab;
-            touch-action: none !important; /* Убирает конфликт скролла и перетаскивания на iOS/Android */
+            touch-action: none !important;
         }
 
-        /* Состояние перетаскиваемой карточки */
         .grid-item.dragging {
             position: fixed !important;
             z-index: 1000 !important;
@@ -155,7 +157,6 @@
             cursor: grabbing;
         }
 
-        /* Пустой слот-ориентир на сетке */
         .grid-item-placeholder {
             background: rgba(0, 0, 0, 0.03);
             border: 2px dashed var(--border-color);
@@ -181,7 +182,6 @@
             margin-top: 12px;
         }
 
-        /* Кнопка удаления сферы (видна только при редактировании) */
         .delete-cat-btn {
             display: none;
             position: absolute;
@@ -204,7 +204,6 @@
             display: flex;
         }
 
-        /* Карточка создания новой сферы */
         .grid-item.add-btn-card {
             border: 1px dashed var(--text-muted);
             background: transparent !important;
@@ -218,7 +217,7 @@
             padding-right: 0;
         }
 
-        /* Списки целей и планов */
+        /* Списки целей */
         .task-container {
             display: none;
             flex-direction: column;
@@ -307,7 +306,7 @@
             display: block;
         }
 
-        /* Блок пошагового плана действий */
+        /* План действий */
         .action-plan-box {
             margin-left: 34px;
             margin-top: 4px;
@@ -366,7 +365,6 @@
             color: var(--text-muted);
         }
 
-        /* Кнопки действий */
         .task-actions {
             display: flex;
             gap: 12px;
@@ -383,23 +381,220 @@
             transition: color 0.15s, transform 0.1s;
             -webkit-tap-highlight-color: transparent;
         }
-        .edit-task-btn {
-            font-size: 16px;
+        .edit-task-btn { font-size: 16px; }
+        .delete-task-btn { font-size: 22px; }
+        .edit-task-btn:active, .delete-task-btn:active { transform: scale(0.85); }
+        .edit-task-btn:hover { color: var(--accent); }
+        .delete-task-btn:hover { color: var(--danger); }
+
+        /* ЭКРАН ЛИЧНОГО ПРОФИЛЯ */
+        .profile-container {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+            padding: 8px 24px 120px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
-        .delete-task-btn {
-            font-size: 22px;
-        }
-        .edit-task-btn:active, .delete-task-btn:active {
-            transform: scale(0.85);
-        }
-        .edit-task-btn:hover {
-            color: var(--accent);
-        }
-        .delete-task-btn:hover {
-            color: var(--danger);
+        .profile-container::-webkit-scrollbar {
+            display: none;
         }
 
-        /* Контекстные листы и меню */
+        .profile-main-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 26px 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+            border: 1px solid rgba(0,0,0,0.03);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        /* Интерактивная зона аватарки */
+        .profile-avatar {
+            width: 86px;
+            height: 86px;
+            background: var(--text-main);
+            color: var(--card-bg);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 34px;
+            font-weight: 700;
+            margin-bottom: 14px;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+            transition: transform 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .profile-avatar:active {
+            transform: scale(0.95);
+        }
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .profile-avatar-overlay {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            background: rgba(0,0,0,0.4);
+            color: #fff;
+            font-size: 9px;
+            font-weight: 600;
+            padding: 3px 0 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .profile-avatar:hover .profile-avatar-overlay {
+            opacity: 1;
+        }
+
+        /* Интерактивная строка имени */
+        .profile-name-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 6px;
+            cursor: pointer;
+            padding: 2px 8px;
+            border-radius: 8px;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .profile-name-row:active {
+            background: rgba(0,0,0,0.03);
+        }
+        .profile-name {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+        .profile-name-edit-icon {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .profile-rank {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            background: rgba(0, 122, 255, 0.08);
+            padding: 4px 12px;
+            border-radius: 100px;
+            margin-bottom: 18px;
+        }
+        .profile-motto-box {
+            border-top: 1px solid var(--border-color);
+            padding-top: 14px;
+            width: 100%;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .profile-motto-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        .profile-motto-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+            font-style: italic;
+            line-height: 1.4;
+        }
+
+        /* Сетка быстрой статистики */
+        .stats-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .stat-summary-box {
+            background: var(--card-bg);
+            border-radius: 18px;
+            padding: 16px;
+            text-align: center;
+            border: 1px solid rgba(0,0,0,0.02);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.01);
+        }
+        .stat-summary-value {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+        .stat-summary-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        /* Карточка жизненного баланса */
+        .balance-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 20px;
+            border: 1px solid rgba(0,0,0,0.02);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.01);
+        }
+        .balance-card-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+        }
+        .balance-item {
+            margin-bottom: 16px;
+        }
+        .balance-item:last-child {
+            margin-bottom: 0;
+        }
+        .balance-info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .balance-cat-name {
+            color: var(--text-main);
+        }
+        .balance-cat-percent {
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+        .balance-progress-bg {
+            height: 6px;
+            background: var(--bg-color);
+            border-radius: 100px;
+            overflow: hidden;
+        }
+        .balance-progress-fill {
+            height: 100%;
+            border-radius: 100px;
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        /* Листы и меню */
         .action-sheet-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -413,10 +608,7 @@
             pointer-events: none;
             transition: opacity 0.2s ease;
         }
-        .action-sheet-overlay.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
+        .action-sheet-overlay.active { opacity: 1; pointer-events: auto; }
         .action-sheet {
             width: 100%;
             background: var(--card-bg);
@@ -425,9 +617,7 @@
             transform: translateY(100%);
             transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .action-sheet-overlay.active .action-sheet {
-            transform: translateY(0);
-        }
+        .action-sheet-overlay.active .action-sheet { transform: translateY(0); }
         .action-sheet-title {
             font-size: 13px;
             font-weight: 700;
@@ -450,11 +640,7 @@
             cursor: pointer;
             -webkit-tap-highlight-color: transparent;
         }
-        .action-sheet-btn.cancel {
-            background: transparent;
-            border: none;
-            color: var(--danger);
-        }
+        .action-sheet-btn.cancel { background: transparent; border: none; color: var(--danger); }
 
         /* Модальные окна */
         .modal-overlay {
@@ -472,10 +658,7 @@
             transition: opacity 0.15s ease;
             padding: 24px;
         }
-        .modal-overlay.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
         .modal-content {
             width: 100%;
             max-width: 340px;
@@ -486,26 +669,10 @@
             transition: transform 0.15s ease;
             box-shadow: 0 12px 30px rgba(0,0,0,0.1);
         }
-        .modal-overlay.active .modal-content {
-            transform: scale(1);
-        }
-        .modal-title {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 4px;
-            text-align: center;
-        }
-        .modal-subtitle {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-bottom: 16px;
-            text-align: center;
-        }
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
+        .modal-overlay.active .modal-content { transform: scale(1); }
+        .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; text-align: center; }
+        .modal-subtitle { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; text-align: center; }
+        .input-group { display: flex; flex-direction: column; gap: 10px; }
         .modal-input {
             width: 100%;
             padding: 12px 14px;
@@ -518,35 +685,12 @@
             -webkit-user-select: text;
             user-select: text;
         }
-        .modal-input:focus {
-            border-color: var(--accent);
-        }
-        .modal-textarea {
-            resize: none;
-            height: 70px;
-        }
-        .modal-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        .modal-btn {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        .modal-btn.cancel {
-            background: var(--bg-color);
-            color: var(--text-muted);
-        }
-        .modal-btn.save {
-            background: var(--text-main);
-            color: var(--card-bg);
-        }
+        .modal-input:focus { border-color: var(--accent); }
+        .modal-textarea { resize: none; height: 70px; }
+        .modal-buttons { display: flex; gap: 10px; margin-top: 20px; }
+        .modal-btn { flex: 1; padding: 12px; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; }
+        .modal-btn.cancel { background: var(--bg-color); color: var(--text-muted); }
+        .modal-btn.save { background: var(--text-main); color: var(--card-bg); }
 
         /* Навигация */
         .bottom-nav {
@@ -585,7 +729,6 @@
             stroke-width: 2;
         }
 
-        /* Тултипы */
         .nav-item::after {
             content: attr(data-tooltip);
             position: absolute;
@@ -602,19 +745,17 @@
             opacity: 0;
             pointer-events: none;
             box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-            transition: opacity 0.15s cubic-bezier(0.4, 0, 0.2, 1), transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: opacity 0.15s ease, transform 0.15s ease;
             z-index: 100;
         }
-
-        .nav-item:hover::after {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
+        .nav-item:hover::after { opacity: 1; transform: translateX(-50%) translateY(0); }
     </style>
 </head>
 <body>
 
+<!-- Скрытые инпуты загрузки изображений -->
 <input type="file" id="globalFileInput" accept="image/*" style="display:none;">
+<input type="file" id="avatarFileInput" accept="image/*" style="display:none;">
 
 <div class="app-container">
     <header class="header">
@@ -623,8 +764,11 @@
             <div class="subtitle" id="subTitle">СФЕРЫ ЖИЗНИ</div>
         </div>
         <div class="header-actions">
-            <button class="header-btn" id="editOrderBtn" title="Изменить порядок (Перетаскивание)">
+            <button class="header-btn" id="editOrderBtn" title="Изменить порядок">
                 <svg viewBox="0 0 24 24"><path d="M11 5h10M11 12h10M11 19h10M3 6l3-3 3 3M6 3v18M3 18l3 3 3-3"/></svg>
+            </button>
+            <button class="header-btn" id="profileBtn" title="Личный профиль">
+                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             </button>
             <button class="header-btn" id="backBtn" style="display:none;">
                 <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
@@ -635,14 +779,54 @@
         </div>
     </header>
 
+    <!-- 1. Главная лента сфер -->
     <div class="main-viewport" id="mainViewport">
         <div class="categories-grid" id="categoriesGrid"></div>
     </div>
 
+    <!-- 2. Задачи внутри сферы -->
     <div class="task-container" id="taskContainer">
         <ul class="task-list" id="taskList"></ul>
     </div>
 
+    <!-- 3. Экран Личного Профиля -->
+    <div class="profile-container" id="profileContainer">
+        <div class="profile-main-card">
+            <!-- Интерактивный аватар -->
+            <div class="profile-avatar" id="profileAvatar" title="Сменить аватар">
+                <span id="avatarFallback">S</span>
+                <div class="profile-avatar-overlay">Фото</div>
+            </div>
+            <!-- Интерактивный никнейм -->
+            <div class="profile-name-row" id="profileNameRow" title="Изменить никнейм">
+                <div class="profile-name" id="profileName">Slava</div>
+                <div class="profile-name-edit-icon">✎</div>
+            </div>
+            <div class="profile-rank" id="profileRank">Новичок</div>
+            <div class="profile-motto-box" id="profileMottoBox">
+                <div class="profile-motto-label">Главный фокус года</div>
+                <div class="profile-motto-text" id="profileMottoText">Введите фокусирование на год...</div>
+            </div>
+        </div>
+
+        <div class="stats-summary-grid">
+            <div class="stat-summary-box">
+                <div class="stat-summary-value" id="statTotalGoals">0</div>
+                <div class="stat-summary-label">Всего целей</div>
+            </div>
+            <div class="stat-summary-box">
+                <div class="stat-summary-value" id="statCompletedGoals" style="color: var(--success);">0</div>
+                <div class="stat-summary-label">Реализовано</div>
+            </div>
+        </div>
+
+        <div class="balance-card">
+            <div class="balance-card-title">Баланс жизненных сфер</div>
+            <div id="balanceListContainer"></div>
+        </div>
+    </div>
+
+    <!-- Меню создания цели -->
     <div class="action-sheet-overlay" id="actionSheetOverlay">
         <div class="action-sheet">
             <div class="action-sheet-title" id="actionSheetTitle">Новая цель</div>
@@ -652,6 +836,7 @@
         </div>
     </div>
 
+    <!-- Модальное окно ввода -->
     <div class="modal-overlay" id="inputModalOverlay">
         <div class="modal-content">
             <div class="modal-title" id="modalTitleText">Новый раздел</div>
@@ -669,6 +854,7 @@
         </div>
     </div>
 
+    <!-- Панель навигации -->
     <nav class="bottom-nav">
         <button class="nav-item" id="navHome" data-tooltip="Главный экран">
             <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
@@ -694,14 +880,20 @@
 
     let categories = JSON.parse(localStorage.getItem('premiumCategoriesList')) || defaultCategories;
     let allTodos = JSON.parse(localStorage.getItem('premiumBoardTodos')) || {};
+    let userProfile = JSON.parse(localStorage.getItem('premiumUserProfile')) || {
+        name: "User",
+        motto: "Введите фокусирование на год...",
+        avatar: ""
+    };
     
     let currentCategory = null;
+    let isProfileActive = false;
     let pendingImageBase64 = null;
     let modalMode = "category"; 
     let editingTodoIndex = null;
     let isEditMode = false;
 
-    // Глобальные переменные для Drag-and-Drop механики
+    // Глобальные переменные для Drag-and-Drop
     let dragItem = null;
     let placeholder = null;
     let startX = 0, startY = 0;
@@ -710,10 +902,12 @@
     const mainViewport = document.getElementById('mainViewport');
     const categoriesGrid = document.getElementById('categoriesGrid');
     const taskContainer = document.getElementById('taskContainer');
+    const profileContainer = document.getElementById('profileContainer');
     
     const backBtn = document.getElementById('backBtn');
     const addActionBtn = document.getElementById('addActionBtn');
     const editOrderBtn = document.getElementById('editOrderBtn');
+    const profileBtn = document.getElementById('profileBtn');
     const mainTitle = document.getElementById('mainTitle');
     const subTitle = document.getElementById('subTitle');
     const taskList = document.getElementById('taskList');
@@ -724,6 +918,7 @@
     const actionUploadPhoto = document.getElementById('actionUploadPhoto');
     const actionCancel = document.getElementById('actionCancel');
     const globalFileInput = document.getElementById('globalFileInput');
+    const avatarFileInput = document.getElementById('avatarFileInput');
 
     const inputModalOverlay = document.getElementById('inputModalOverlay');
     const modalTitleText = document.getElementById('modalTitleText');
@@ -779,7 +974,7 @@
         categoriesGrid.appendChild(addCard);
     }
 
-    // --- Улучшенный Механизм Сортировки с защитой от скролла и Автопрокруткой ленты ---
+    // --- Механизм Сортировки ---
     function handlePointerDown(e, item) {
         if (!isEditMode) return;
         if (e.target.closest('.delete-cat-btn')) return;
@@ -807,7 +1002,6 @@
         document.body.appendChild(dragItem);
         
         dragItem.setPointerCapture(e.pointerId);
-        
         dragItem.addEventListener('pointermove', handlePointerMove);
         dragItem.addEventListener('pointerup', handlePointerUp);
         dragItem.addEventListener('pointercancel', handlePointerUp);
@@ -815,28 +1009,25 @@
 
     function handlePointerMove(e) {
         if (!dragItem) return;
-        
         const dx = e.clientX - startX;
         const dy = e.clientY - startY;
         
         dragItem.style.left = (initialLeft + dx) + 'px';
         dragItem.style.top = (initialTop + dy) + 'px';
         
-        // Автоматический скролл контейнера при приближении к границам экрана
         const viewRect = mainViewport.getBoundingClientRect();
-        const scrollZone = 80; // Чувствительность зоны краев (в пикселях)
+        const scrollZone = 80;
         
         if (e.clientY < viewRect.top + scrollZone) {
-            mainViewport.scrollTop -= 10; // Скроллим вверх
+            mainViewport.scrollTop -= 10;
         } else if (e.clientY > viewRect.bottom - scrollZone) {
-            mainViewport.scrollTop += 10; // Скроллим вниз
+            mainViewport.scrollTop += 10;
         }
         
         const elementUnder = document.elementFromPoint(e.clientX, e.clientY);
         if (!elementUnder) return;
         
         const targetCard = elementUnder.closest('.grid-item:not(.dragging):not(.add-btn-card)');
-        
         if (targetCard && targetCard !== placeholder) {
             const children = Array.from(categoriesGrid.children);
             const placeholderIndex = children.indexOf(placeholder);
@@ -852,40 +1043,30 @@
 
     function handlePointerUp(e) {
         if (!dragItem) return;
-        
         dragItem.removeEventListener('pointermove', handlePointerMove);
         dragItem.removeEventListener('pointerup', handlePointerUp);
         dragItem.removeEventListener('pointercancel', handlePointerUp);
-        
         dragItem.releasePointerCapture(e.pointerId);
         
         dragItem.classList.remove('dragging');
-        dragItem.style.width = '';
-        dragItem.style.height = '';
-        dragItem.style.left = '';
-        dragItem.style.top = '';
+        dragItem.style.width = ''; dragItem.style.height = ''; dragItem.style.left = ''; dragItem.style.top = '';
         
         if (placeholder && placeholder.parentNode) {
             placeholder.parentNode.insertBefore(dragItem, placeholder);
             placeholder.remove();
         }
-        
-        dragItem = null;
-        placeholder = null;
-        
+        dragItem = null; placeholder = null;
         updateCategoriesOrderFromDOM();
     }
 
     function updateCategoriesOrderFromDOM() {
         const currentDOMItems = Array.from(categoriesGrid.querySelectorAll('.grid-item:not(.add-btn-card)'));
         const newOrderedArray = [];
-        
         currentDOMItems.forEach(domItem => {
             const catId = domItem.dataset.id;
             const foundObj = categories.find(c => c.id === catId);
             if (foundObj) newOrderedArray.push(foundObj);
         });
-        
         categories = newOrderedArray;
         saveData();
     }
@@ -894,33 +1075,173 @@
         isEditMode = !isEditMode;
         renderCategoriesGrid();
     }
-
     editOrderBtn.addEventListener('click', toggleEditMode);
 
+    // --- Логика навигации экранов ---
     function openCategory(cat) {
         currentCategory = cat.id;
+        isProfileActive = false;
         mainViewport.style.display = 'none';
+        profileContainer.style.display = 'none';
         taskContainer.style.display = 'flex';
+        
         backBtn.style.display = 'block';
         addActionBtn.style.display = 'block';
         editOrderBtn.style.display = 'none';
+        profileBtn.style.display = 'none';
+        
         mainTitle.textContent = cat.title;
         subTitle.textContent = "План реализации";
         actionSheetTitle.textContent = cat.title;
         renderTasks();
     }
 
+    function openProfile() {
+        isProfileActive = true;
+        currentCategory = null;
+        if (isEditMode) toggleEditMode();
+
+        mainViewport.style.display = 'none';
+        taskContainer.style.display = 'none';
+        profileContainer.style.display = 'flex';
+
+        backBtn.style.display = 'block';
+        addActionBtn.style.display = 'none';
+        editOrderBtn.style.display = 'none';
+        profileBtn.style.display = 'none';
+
+        mainTitle.textContent = "ПРОФИЛЬ";
+        subTitle.textContent = "Личная аналитика";
+        renderProfileStats();
+    }
+    profileBtn.addEventListener('click', openProfile);
+
     function goHome() {
         currentCategory = null;
+        isProfileActive = false;
         mainViewport.style.display = 'block';
         taskContainer.style.display = 'none';
+        profileContainer.style.display = 'none';
+        
         backBtn.style.display = 'none';
         addActionBtn.style.display = 'none';
         editOrderBtn.style.display = 'block';
+        profileBtn.style.display = 'block';
+        
         mainTitle.textContent = "BOARD";
         subTitle.textContent = "СФЕРЫ ЖИЗНИ";
         renderCategoriesGrid();
     }
+    backBtn.addEventListener('click', goHome);
+
+    // --- Аналитика и рендеринг профиля ---
+    function renderProfileStats() {
+        document.getElementById('profileName').textContent = userProfile.name;
+        document.getElementById('profileMottoText').textContent = userProfile.motto;
+
+        // Обработка кастомной аватарки
+        const avatarContainer = document.getElementById('profileAvatar');
+        const fallbackSpan = document.getElementById('avatarFallback');
+        
+        // Удаляем старый тег img, если он был
+        const oldImg = avatarContainer.querySelector('img');
+        if (oldImg) oldImg.remove();
+
+        if (userProfile.avatar) {
+            fallbackSpan.style.display = 'none';
+            const img = document.createElement('img');
+            img.src = userProfile.avatar;
+            avatarContainer.insertBefore(img, avatarContainer.firstChild);
+        } else {
+            fallbackSpan.style.display = 'block';
+            fallbackSpan.textContent = userProfile.name ? userProfile.name.charAt(0).toUpperCase() : 'S';
+        }
+
+        let totalGoals = 0;
+        let completedGoals = 0;
+        const balanceListContainer = document.getElementById('balanceListContainer');
+        balanceListContainer.innerHTML = '';
+
+        categories.forEach(cat => {
+            const list = allTodos[cat.id] || [];
+            const total = list.length;
+            const completed = list.filter(t => t.completed).length;
+
+            totalGoals += total;
+            completedGoals += completed;
+
+            let percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+            const item = document.createElement('div');
+            item.className = 'balance-item';
+            item.innerHTML = `
+                <div class="balance-info-row">
+                    <span class="balance-cat-name">${cat.title}</span>
+                    <span class="balance-cat-percent">${completed}/${total} (${percentage}%)</span>
+                </div>
+                <div class="balance-progress-bg">
+                    <div class="balance-progress-fill" style="width: ${percentage}%; background-color: ${cat.color === '#FFFFFF' ? 'var(--accent)' : cat.color}; filter: brightness(0.85);"></div>
+                </div>
+            `;
+            balanceListContainer.appendChild(item);
+        });
+
+        document.getElementById('statTotalGoals').textContent = totalGoals;
+        document.getElementById('statCompletedGoals').textContent = completedGoals;
+
+        // Расчет уровня геймификации
+        let rank = "Новичок фокуса";
+        if (completedGoals >= 5 && completedGoals < 15) rank = "Создатель реальности";
+        else if (completedGoals >= 15) rank = "Магистр баланса 👑";
+        document.getElementById('profileRank').textContent = rank;
+    }
+
+    // Изменение аватарки по клику
+    document.getElementById('profileAvatar').addEventListener('click', () => {
+        avatarFileInput.click();
+    });
+
+    avatarFileInput.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                const size = 240; // Оптимальный размер квадратного аватара
+                canvas.width = size; canvas.height = size;
+                const ctx = canvas.getContext('2d');
+                
+                // Кроп по центру в квадрат
+                const side = Math.min(img.width, img.height);
+                ctx.drawImage(img, (img.width - side) / 2, (img.height - side) / 2, side, side, 0, 0, size, size);
+                
+                userProfile.avatar = canvas.toDataURL('image/jpeg', 0.85);
+                saveData();
+                renderProfileStats();
+                avatarFileInput.value = '';
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    });
+
+    // Изменение никнейма по клику
+    document.getElementById('profileNameRow').addEventListener('click', () => {
+        modalMode = "edit-name";
+        modalPlanInput.style.display = "none";
+        modalTextInput.value = userProfile.name;
+        openInputModal("Изменить никнейм", "Введите ваше имя для профиля:", "Например: Slava");
+    });
+
+    // Редактирование фокуса года по клику
+    document.getElementById('profileMottoBox').addEventListener('click', () => {
+        modalMode = "edit-motto";
+        modalPlanInput.style.display = "none";
+        modalTextInput.value = userProfile.motto;
+        openInputModal("Фокус года", "Задайте ваш главный вектор или девиз:", "Например: Год масштабирования и здоровья");
+    });
 
     function deleteCategory(id, event) {
         if (event) event.stopPropagation();
@@ -978,11 +1299,9 @@
         modalMode = "edit-todo";
         editingTodoIndex = index;
         const task = allTodos[currentCategory][index];
-        
         modalPlanInput.style.display = "block";
         modalTextInput.value = task.text || "";
         modalPlanInput.value = task.steps ? task.steps.map(s => s.text).join(', ') : "";
-        
         openInputModal("Редактировать цель", "Измените описание или шаги плана:", "Например: Купить машину");
     };
 
@@ -994,17 +1313,9 @@
         renderTasks();
     };
 
-    addActionBtn.addEventListener('click', () => {
-        actionSheetOverlay.classList.add('active');
-    });
-
-    function closeActionSheet() {
-        actionSheetOverlay.classList.remove('active');
-    }
-
-    actionSheetOverlay.addEventListener('click', (e) => {
-        if (e.target === actionSheetOverlay) closeActionSheet();
-    });
+    addActionBtn.addEventListener('click', () => actionSheetOverlay.classList.add('active'));
+    function closeActionSheet() { actionSheetOverlay.classList.remove('active'); }
+    actionSheetOverlay.addEventListener('click', (e) => { if (e.target === actionSheetOverlay) closeActionSheet(); });
     actionCancel.addEventListener('click', closeActionSheet);
 
     function openInputModal(title, subtitle, placeholderText) {
@@ -1014,12 +1325,7 @@
         inputModalOverlay.classList.add('active');
         setTimeout(() => modalTextInput.focus(), 150);
     }
-
-    function closeInputModal() {
-        inputModalOverlay.classList.remove('active');
-        modalTextInput.blur();
-    }
-
+    function closeInputModal() { inputModalOverlay.classList.remove('active'); modalTextInput.blur(); }
     modalCancelBtn.addEventListener('click', closeInputModal);
 
     actionAddText.addEventListener('click', () => {
@@ -1029,43 +1335,27 @@
         modalPlanInput.style.display = "block";
         modalTextInput.value = "";
         modalPlanInput.value = "";
-        setTimeout(() => {
-            openInputModal("Новая цель", "Опишите цель и шаги к ней через запятую (необязательно):", "Например: Купить машину");
-        }, 200);
+        setTimeout(() => openInputModal("Новая цель", "Опишите цель и шаги к ней через запятую:", "Например: Купить машину"), 200);
     });
 
-    actionUploadPhoto.addEventListener('click', () => {
-        closeActionSheet();
-        globalFileInput.click();
-    });
+    actionUploadPhoto.addEventListener('click', () => { closeActionSheet(); globalFileInput.click(); });
 
     globalFileInput.addEventListener('change', (event) => {
         const file = event.target.files[0];
         if (!file || !currentCategory) return;
-
         const reader = new FileReader();
         reader.onload = function(e) {
             const img = new Image();
             img.onload = function() {
                 const canvas = document.createElement('canvas');
-                const MAX_WIDTH = 1200;
-                const MAX_HEIGHT = 1200;
-                let width = img.width;
-                let height = img.height;
-
-                if (width > height) {
-                    if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
-                } else {
-                    if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
-                }
-                
-                canvas.width = width;
-                canvas.height = height;
+                const MAX_WIDTH = 1200; const MAX_HEIGHT = 1200;
+                let width = img.width; let height = img.height;
+                if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } }
+                else { if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; } }
+                canvas.width = width; canvas.height = height;
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, width, height);
-                
                 pendingImageBase64 = canvas.toDataURL('image/jpeg', 0.85);
-                
                 modalMode = "todo";
                 modalPlanInput.style.display = "block";
                 modalTextInput.value = "";
@@ -1086,118 +1376,78 @@
             if (!textVal) return closeInputModal();
             const colors = ["#FFF9E6", "#E6F7ED", "#FCE8E6", "#E6F0FA", "#EAF2F8", "#F5E6FA"];
             const randomColor = colors[Math.floor(Math.random() * colors.length)];
-            
-            categories.push({
-                id: "custom_" + Date.now(),
-                title: textVal,
-                color: randomColor
-            });
-            saveData();
-            renderCategoriesGrid();
-            closeInputModal();
+            categories.push({ id: "custom_" + Date.now(), title: textVal, color: randomColor });
+            saveData(); renderCategoriesGrid(); closeInputModal();
         } else if (modalMode === "todo") {
             if (!textVal && !pendingImageBase64) return closeInputModal();
-            
             let parsedSteps = [];
             if (planVal) {
-                parsedSteps = planVal.split(',')
-                    .map(step => step.trim())
-                    .filter(step => step.length > 0)
-                    .map(step => ({ text: step, completed: false }));
+                parsedSteps = planVal.split(',').map(s => s.trim()).filter(s => s.length > 0).map(s => ({ text: s, completed: false }));
             }
-
             if (!allTodos[currentCategory]) allTodos[currentCategory] = [];
-            allTodos[currentCategory].push({
-                text: textVal,
-                image: pendingImageBase64,
-                steps: parsedSteps,
-                completed: false
-            });
-            
-            saveData();
-            renderTasks();
-            closeInputModal();
-            pendingImageBase64 = null;
+            allTodos[currentCategory].push({ text: textVal, image: pendingImageBase64, steps: parsedSteps, completed: false });
+            saveData(); renderTasks(); closeInputModal(); pendingImageBase64 = null;
         } else if (modalMode === "edit-todo") {
             const currentTasks = allTodos[currentCategory] || [];
             if (!textVal && !currentTasks[editingTodoIndex].image) return closeInputModal();
-            
             const oldTask = currentTasks[editingTodoIndex];
-            
             let parsedSteps = [];
             if (planVal) {
-                parsedSteps = planVal.split(',')
-                    .map(step => step.trim())
-                    .filter(step => step.length > 0)
-                    .map(step => {
-                        const oldStep = oldTask.steps ? oldTask.steps.find(s => s.text === step) : null;
-                        return { text: step, completed: oldStep ? oldStep.completed : false };
-                    });
+                parsedSteps = planVal.split(',').map(s => s.trim()).filter(s => s.length > 0).map(s => {
+                    const oldStep = oldTask.steps ? oldTask.steps.find(os => os.text === s) : null;
+                    return { text: s, completed: oldStep ? oldStep.completed : false };
+                });
             }
-
-            oldTask.text = textVal;
-            oldTask.steps = parsedSteps;
-            
-            saveData();
-            renderTasks();
-            closeInputModal();
-            editingTodoIndex = null;
+            oldTask.text = textVal; oldTask.steps = parsedSteps;
+            saveData(); renderTasks(); closeInputModal(); editingTodoIndex = null;
+        } else if (modalMode === "edit-motto") {
+            userProfile.motto = textVal || "Задать главный вектор года";
+            saveData(); renderProfileStats(); closeInputModal();
+        } else if (modalMode === "edit-name") {
+            userProfile.name = textVal || "Slava";
+            saveData(); renderProfileStats(); closeInputModal();
         }
     });
 
     window.toggleTask = function(index) {
         allTodos[currentCategory][index].completed = !allTodos[currentCategory][index].completed;
-        saveData();
-        renderTasks();
+        saveData(); renderTasks();
     };
 
     window.deleteTask = function(index) {
         if (confirm("Удалить эту цель?")) {
             allTodos[currentCategory].splice(index, 1);
-            saveData();
-            renderTasks();
+            saveData(); renderTasks();
         }
     };
 
     function saveData() {
         localStorage.setItem('premiumCategoriesList', JSON.stringify(categories));
         localStorage.setItem('premiumBoardTodos', JSON.stringify(allTodos));
+        localStorage.setItem('premiumUserProfile', JSON.stringify(userProfile));
     }
 
-    document.getElementById('navHome').addEventListener('click', () => {
-        if (isEditMode) toggleEditMode();
-        goHome();
-    });
-
+    document.getElementById('navHome').addEventListener('click', () => { if (isEditMode) toggleEditMode(); goHome(); });
     document.getElementById('navClear').addEventListener('click', () => {
         if (!currentCategory) return alert("Сначала откройте какую-либо сферу!");
         if (allTodos[currentCategory]) {
             allTodos[currentCategory] = allTodos[currentCategory].filter(t => !t.completed);
-            saveData();
-            renderTasks();
+            saveData(); renderTasks();
         }
     });
 
     document.getElementById('navReset').addEventListener('click', () => {
-        if (confirm("Сбросить приложение? Это сотрет все созданные разделы, фотографии и выстроенный вами порядок.")) {
-            localStorage.removeItem('premiumCategoriesList');
-            localStorage.removeItem('premiumBoardTodos');
-            categories = defaultCategories;
-            allTodos = {};
-            isEditMode = false;
-            goHome();
+        if (confirm("Сбросить приложение? Это сотрет все созданные разделы, фотографии и профиль.")) {
+            localStorage.clear();
+            categories = defaultCategories; allTodos = {}; userProfile = { name: "User", motto: "Введите фокусирование на год...", avatar: "" };
+            isEditMode = false; goHome();
         }
     });
 
-    backBtn.addEventListener('click', goHome);
     renderCategoriesGrid();
-
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js')
-        .then(() => console.log('PWA OK'))
-        .catch(err => console.log('PWA ERR', err));
+        navigator.serviceWorker.register('sw.js').then(() => console.log('PWA OK')).catch(err => console.log('PWA ERR', err));
     }
 </script>
-
 </body>
 </html>
