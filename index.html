@@ -69,27 +69,32 @@
             transition: background-color 0.3s;
         }
 
-        .header-left {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            min-width: 0;
-        }
+            .header-left {
+        display: flex;
+        flex-direction: column;
+        /* Указываем, что заголовок не должен выталкивать кнопки */
+        flex: 1; 
+        min-width: 0; 
+        overflow: hidden; /* Скрываем выход текста за границы */
+        margin-right: 10px; /* Добавляем небольшой отступ от кнопок справа */
+    }
 
-        #mainTitle {
-            font-size: 26px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            color: var(--text-main);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            cursor: pointer;
-            transition: opacity 0.15s;
-            display: inline-block;
-            align-self: flex-start;
-            -webkit-tap-highlight-color: transparent;
-        }
+    #mainTitle {
+        font-size: 26px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+        color: var(--text-main);
+        /* Включаем обрезку длинного текста */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        
+        cursor: pointer;
+        transition: opacity 0.15s;
+        display: inline-block;
+        align-self: flex-start;
+        -webkit-tap-highlight-color: transparent;
+    }
         #mainTitle:active {
             opacity: 0.6;
         }
