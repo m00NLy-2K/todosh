@@ -172,7 +172,6 @@
         }
 
         body.dark .grid-item {
-            /* Смягчение кастомных пастельных цветов в темной теме для комфорта глаз */
             background-blend-mode: multiply;
             background-color: rgba(255, 255, 255, 0.15) !important;
         }
@@ -571,7 +570,7 @@
         .stat-summary-value { font-size: 26px; font-weight: 700; color: var(--text-main); }
         .stat-summary-label { font-size: 11px; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
 
-        /* БЛОК НАСТРОЕК В ПРОФИЛЕ (Новый) */
+        /* БЛОК НАСТРОЕК В ПРОФИЛЕ */
         .settings-card {
             background: var(--card-bg);
             border-radius: 24px;
@@ -884,7 +883,7 @@
             
             <div class="input-group">
                 <input type="text" class="modal-input" id="modalTextInput" placeholder="..." maxlength="100">
-                <textarea class="modal-input modal-textarea" id="modalPlanInput" placeholder="План действий: Шаг 1, Шаг 2, Шаг 3 (через запятую)..." style="display:none;"></textarea>
+                <textarea class="modal-input modal-textarea" id="modalPlanInput" placeholder="План действий: Шаг 1, Шаг 1, Шаг 3 (через запятую)..." style="display:none;"></textarea>
             </div>
 
             <div class="modal-buttons">
@@ -907,10 +906,9 @@
 
     let categories = JSON.parse(localStorage.getItem('premiumCategoriesList')) || defaultCategories;
     let allTodos = JSON.parse(localStorage.getItem('premiumBoardTodos')) || {};
-    let allArchive = JSON.parse(localStorage.getItem('premiumBoardArchive')) || {};
     
     let userProfile = JSON.parse(localStorage.getItem('premiumUserProfile')) || {
-        name: "",
+        name: "Слава",
         motto: "",
         avatar: ""
     };
@@ -923,399 +921,505 @@
     let editingTodoIndex = null;
     let isEditMode = false;
 
-    let dragItem = null;
-    let placeholder = null;
-    let startX = 0, startY = 0;
-    let initialLeft = 0, initialTop = 0;
-
+    // Ссылки на элементы DOM
     const mainViewport = document.getElementById('mainViewport');
     const categoriesGrid = document.getElementById('categoriesGrid');
     const taskContainer = document.getElementById('taskContainer');
+    const taskList = document.getElementById('taskList');
     const profileContainer = document.getElementById('profileContainer');
-    
+    const balanceListContainer = document.getElementById('balanceListContainer');
+
+    // Кнопки шапки
     const backBtn = document.getElementById('backBtn');
     const addActionBtn = document.getElementById('addActionBtn');
-    const editOrderBtn = document.getElementById('editOrderBtn');
     const profileBtn = document.getElementById('profileBtn');
-    const historyBtn = document.getElementById('historyBtn'); 
+    const editOrderBtn = document.getElementById('editOrderBtn');
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+    const historyBtn = document.getElementById('historyBtn');
+    
+    // Текстовые ноды шапки
     const mainTitle = document.getElementById('mainTitle');
     const subTitle = document.getElementById('subTitle');
-    const taskList = document.getElementById('taskList');
 
+    // Модалки и листы
     const actionSheetOverlay = document.getElementById('actionSheetOverlay');
-    const actionSheetTitle = document.getElementById('actionSheetTitle');
-    const actionAddText = document.getElementById('actionAddText');
-    const actionUploadPhoto = document.getElementById('actionUploadPhoto');
-    const actionCancel = document.getElementById('actionCancel');
-    const globalFileInput = document.getElementById('globalFileInput');
-    const avatarFileInput = document.getElementById('avatarFileInput');
-    const backupFileInput = document.getElementById('backupFileInput');
-
     const inputModalOverlay = document.getElementById('inputModalOverlay');
-    const modalTitleText = document.getElementById('modalTitleText');
-    const modalSubtitleText = document.getElementById('modalSubtitleText');
     const modalTextInput = document.getElementById('modalTextInput');
     const modalPlanInput = document.getElementById('modalPlanInput');
-    const modalCancelBtn = document.getElementById('modalCancelBtn');
-    const modalSaveBtn = document.getElementById('modalSaveBtn');
 
-    // Логика переключения Темной Темы
-    const themeToggleBtn = document.getElementById('themeToggleBtn');
-    const themeIcon = document.getElementById('themeIcon');
-    let savedTheme = localStorage.getItem('premiumTheme') || 'light';
-    
-    if (savedTheme === 'dark') {
-        document.body.classList.add('dark');
-        updateThemeIcon(true);
+    // --- СТРОГАЯ ЛОГИКА УВЕДОМЛЕНИЙ БЕЗ СЛОВА "ВКЛЮЧЕНО" ---
+    const notificationStatusText = document.getElementById('notificationStatusText');
+    const notificationToggleBtn = document.getElementById('notificationToggleBtn');
+
+    if (notificationStatusText) {
+        Object.defineProperty(notificationStatusText, 'innerText', {
+            get: function() { return this.textContent; },
+            set: function(value) {
+                if (value === 'Включены' || value === 'Включено' || value === 'Вкл') {
+                    this.textContent = 'Вкл';
+                    this.style.color = 'var(--success)';
+                } else {
+                    this.textContent = 'Выкл';
+                    this.style.color = 'var(--text-muted)';
+                }
+            },
+            configurable: true
+        });
     }
 
+    function initNotifications() {
+        let isEnabled = localStorage.getItem('premiumNotificationsActive') === 'true';
+        if (notificationStatusText) {
+            notificationStatusText.innerText = isEnabled ? 'Вкл' : 'Выкл';
+        }
+    }
+
+    notificationToggleBtn.addEventListener('click', async () => {
+        let isEnabled = localStorage.getItem('premiumNotificationsActive') === 'true';
+        if (isEnabled) {
+            localStorage.setItem('premiumNotificationsActive', 'false');
+            notificationStatusText.innerText = 'Выкл';
+        } else {
+            if (!('Notification' in window)) {
+                alert('Браузер не поддерживает уведомления.');
+                return;
+            }
+            const permission = await Notification.requestPermission();
+            if (permission === 'granted') {
+                localStorage.setItem('premiumNotificationsActive', 'true');
+                notificationStatusText.innerText = 'Вкл';
+                new Notification('Vision Board', { body: 'Напоминания активированы!' });
+            }
+        }
+    });
+
+    // --- СМЕНА ТЕМЫ ОФОРМЛЕНИЯ ---
     themeToggleBtn.addEventListener('click', () => {
-        const isDarkNow = document.body.classList.toggle('dark');
-        localStorage.setItem('premiumTheme', isDarkNow ? 'dark' : 'light');
-        updateThemeIcon(isDarkNow);
+        document.body.classList.toggle('dark');
+        const isDark = document.body.classList.contains('dark');
+        localStorage.setItem('premiumThemeDark', isDark ? 'true' : 'false');
     });
-
-    function updateThemeIcon(isDark) {
-        if (isDark) {
-            // Иконка Солнца
-            themeIcon.innerHTML = `<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>`;
-        } else {
-            // Иконка Луны
-            themeIcon.innerHTML = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>`;
-        }
+    if (localStorage.getItem('premiumThemeDark') === 'true') {
+        document.body.classList.add('dark');
     }
 
-    mainTitle.addEventListener('click', () => {
-        if (isEditMode) toggleEditMode();
-        goHome();
-    });
-
-    function renderCategoriesGrid() {
-        categoriesGrid.innerHTML = '';
-        if (isEditMode) {
-            categoriesGrid.classList.add('edit-mode-active');
-            editOrderBtn.classList.add('active');
-        } else {
-            categoriesGrid.classList.remove('edit-mode-active');
-            editOrderBtn.classList.remove('active');
-        }
-        
-        categories.forEach((cat) => {
-            const activeCount = (allTodos[cat.id] || []).length;
-            const item = document.createElement('div');
-            item.className = 'grid-item';
-            item.style.backgroundColor = cat.color || '#FFFFFF';
-            item.dataset.id = cat.id;
+    // --- РЕНДЕРИНГ КАТЕГОРИЙ ---
+    function renderCategories() {
+        categoriesGrid.innerHTML = "";
+        categories.forEach(cat => {
+            const todos = allTodos[cat.id] || [];
+            const activeCount = todos.filter(t => !t.completed).length;
             
-            item.onclick = (e) => {
-                if (isEditMode || e.target.classList.contains('delete-cat-btn')) return;
-                openCategory(cat);
-            };
+            const card = document.createElement('div');
+            card.className = "grid-item";
+            card.style.backgroundColor = cat.color;
+            card.dataset.id = cat.id;
 
-            item.innerHTML = `
-                <button class="delete-cat-btn" onclick="deleteCategory('${cat.id}', event)">&times;</button>
+            card.innerHTML = `
+                <button class="delete-cat-btn">&times;</button>
                 <div class="grid-text">${cat.title}</div>
                 <div class="badge">${activeCount} активных</div>
             `;
 
-            item.addEventListener('pointerdown', (e) => handlePointerDown(e, item));
-            categoriesGrid.appendChild(item);
+            card.querySelector('.delete-cat-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (confirm(`Удалить сферу "${cat.title}" и все её цели?`)) {
+                    categories = categories.filter(c => c.id !== cat.id);
+                    delete allTodos[cat.id];
+                    saveData();
+                    renderCategories();
+                }
+            });
+
+            card.addEventListener('click', () => {
+                if (isEditMode) return;
+                openCategory(cat);
+            });
+
+            categoriesGrid.appendChild(card);
         });
 
+        // Карточка добавления кастомной сферы
         const addCard = document.createElement('div');
-        addCard.className = 'grid-item add-btn-card';
-        addCard.onclick = () => {
-            if (isEditMode) toggleEditMode();
+        addCard.className = "grid-item add-btn-card";
+        addCard.innerHTML = `<div class="grid-text">+ Добавить сферу</div>`;
+        addCard.addEventListener('click', () => {
             modalMode = "category";
-            modalPlanInput.style.display = "none";
+            document.getElementById('modalTitleText').innerText = "Новая сфера";
+            document.getElementById('modalSubtitleText').innerText = "Введите название жизненной сферы";
+            modalTextInput.placeholder = "Например: Духовность, Хобби...";
             modalTextInput.value = "";
-            modalPlanInput.value = "";
-            openInputModal("Новая сфера", "Какое направление вы хотите добавить?", "Например: Развлечения, Хобби...");
-        };
-        addCard.innerHTML = `<div class="grid-text">+ Создать сферу</div>`;
+            modalPlanInput.style.display = "none";
+            inputModalOverlay.classList.add('active');
+        });
         categoriesGrid.appendChild(addCard);
     }
 
-    function handlePointerDown(e, item) {
-        if (!isEditMode) return;
-        if (e.target.closest('.delete-cat-btn')) return;
+    // --- РЕНДЕРИНГ ЦЕЛЕЙ ---
+    function renderTodos() {
+        taskList.innerHTML = "";
+        if (!currentCategory) return;
 
-        dragItem = item;
-        const rect = dragItem.getBoundingClientRect();
-        
-        placeholder = document.createElement('div');
-        placeholder.className = 'grid-item-placeholder';
-        placeholder.style.width = rect.width + 'px';
-        placeholder.style.height = rect.height + 'px';
-        
-        startX = e.clientX;
-        startY = e.clientY;
-        initialLeft = rect.left;
-        initialTop = rect.top;
-        
-        dragItem.style.width = rect.width + 'px';
-        dragItem.style.height = rect.height + 'px';
-        dragItem.style.left = initialLeft + 'px';
-        dragItem.style.top = initialTop + 'px';
-        dragItem.classList.add('dragging');
-        
-        dragItem.parentNode.insertBefore(placeholder, dragItem);
-        document.body.appendChild(dragItem);
-        
-        dragItem.setPointerCapture(e.pointerId);
-        dragItem.addEventListener('pointermove', handlePointerMove);
-        dragItem.addEventListener('pointerup', handlePointerUp);
-        dragItem.addEventListener('pointercancel', handlePointerUp);
-    }
+        const list = allTodos[currentCategory.id] || [];
+        const filtered = list.filter(t => t.completed === isShowingHistory);
 
-    function handlePointerMove(e) {
-        if (!dragItem) return;
-        const dx = e.clientX - startX;
-        const dy = e.clientY - startY;
-        
-        dragItem.style.left = (initialLeft + dx) + 'px';
-        dragItem.style.top = (initialTop + dy) + 'px';
-        
-        const viewRect = mainViewport.getBoundingClientRect();
-        const scrollZone = 80;
-        
-        if (e.clientY < viewRect.top + scrollZone) {
-            mainViewport.scrollTop -= 10;
-        } else if (e.clientY > viewRect.bottom - scrollZone) {
-            mainViewport.scrollTop += 10;
+        if (filtered.length === 0) {
+            taskList.innerHTML = `<div style="text-align:center; padding: 40px; color:var(--text-muted); font-size:14px;">Здесь пока ничего нет</div>`;
+            return;
         }
-        
-        const elementUnder = document.elementFromPoint(e.clientX, e.clientY);
-        if (!elementUnder) return;
-        
-        const targetCard = elementUnder.closest('.grid-item:not(.dragging):not(.add-btn-card)');
-        if (targetCard && targetCard !== placeholder) {
-            const children = Array.from(categoriesGrid.children);
-            const placeholderIndex = children.indexOf(placeholder);
-            const targetIndex = children.indexOf(targetCard);
-            
-            if (placeholderIndex < targetIndex) {
-                categoriesGrid.insertBefore(placeholder, targetCard.nextSibling);
-            } else {
-                categoriesGrid.insertBefore(placeholder, targetCard);
+
+        filtered.forEach((todo, index) => {
+            const actualIndex = list.indexOf(todo);
+            const li = document.createElement('li');
+            li.className = `task-item ${todo.completed ? 'completed' : ''}`;
+
+            let stepsHtml = "";
+            if (todo.steps && todo.steps.length > 0) {
+                stepsHtml = `
+                    <div class="action-plan-box">
+                        <div class="plan-title">План действий</div>
+                        ${todo.steps.map((step, sIdx) => `
+                            <div class="sub-step-item ${step.completed ? 'sub-completed' : ''}" data-sidx="${sIdx}">
+                                <div class="sub-step-checkbox"></div>
+                                <div class="sub-step-text">${step.text}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
             }
-        }
-    }
 
-    function handlePointerUp(e) {
-        if (!dragItem) return;
-        dragItem.removeEventListener('pointermove', handlePointerMove);
-        dragItem.removeEventListener('pointerup', handlePointerUp);
-        dragItem.removeEventListener('pointercancel', handlePointerUp);
-        dragItem.releasePointerCapture(e.pointerId);
-        
-        dragItem.classList.remove('dragging');
-        dragItem.style.width = ''; dragItem.style.height = ''; dragItem.style.left = ''; dragItem.style.top = '';
-        
-        if (placeholder && placeholder.parentNode) {
-            placeholder.parentNode.insertBefore(dragItem, placeholder);
-            placeholder.remove();
-        }
-        dragItem = null; placeholder = null;
-        updateCategoriesOrderFromDOM();
-    }
+            li.innerHTML = `
+                <div class="task-body">
+                    <div class="task-main-row">
+                        <div class="custom-checkbox"></div>
+                        <div class="task-clickable-zone">
+                            <div class="task-text">${todo.text}</div>
+                        </div>
+                    </div>
+                    ${todo.image ? `<img src="${todo.image}" class="task-media">` : ''}
+                    ${stepsHtml}
+                    <div class="task-actions">
+                        <button class="edit-task-btn">✎ Правка</button>
+                        <button class="delete-task-btn">&times;</button>
+                    </div>
+                </div>
+            `;
 
-    function updateCategoriesOrderFromDOM() {
-        const currentDOMItems = Array.from(categoriesGrid.querySelectorAll('.grid-item:not(.add-btn-card)'));
-        const newOrderedArray = [];
-        currentDOMItems.forEach(domItem => {
-            const catId = domItem.dataset.id;
-            const foundObj = categories.find(c => c.id === catId);
-            if (foundObj) newOrderedArray.push(foundObj);
+            // Чекбокс главной цели
+            li.querySelector('.custom-checkbox').addEventListener('click', () => {
+                todo.completed = !todo.completed;
+                saveData();
+                renderTodos();
+            });
+
+            // Клик по подшагам плана
+            li.querySelectorAll('.sub-step-item').forEach(stepNode => {
+                stepNode.addEventListener('click', () => {
+                    const sIdx = parseInt(stepNode.dataset.sidx);
+                    todo.steps[sIdx].completed = !todo.steps[sIdx].completed;
+                    saveData();
+                    renderTodos();
+                });
+            });
+
+            // Удаление цели
+            li.querySelector('.delete-task-btn').addEventListener('click', () => {
+                if (confirm("Удалить эту цель?")) {
+                    list.splice(actualIndex, 1);
+                    saveData();
+                    renderTodos();
+                }
+            });
+
+            // Редактирование цели
+            li.querySelector('.edit-task-btn').addEventListener('click', () => {
+                modalMode = "editTodo";
+                editingTodoIndex = actualIndex;
+                document.getElementById('modalTitleText').innerText = "Изменить цель";
+                modalTextInput.value = todo.text;
+                modalPlanInput.style.display = "block";
+                modalPlanInput.value = todo.steps ? todo.steps.map(s => s.text).join(', ') : "";
+                inputModalOverlay.classList.add('active');
+            });
+
+            taskList.appendChild(li);
         });
-        categories = newOrderedArray;
-        saveData();
     }
 
-    function toggleEditMode() {
-        isEditMode = !isEditMode;
-        renderCategoriesGrid();
-    }
-    editOrderBtn.addEventListener('click', toggleEditMode);
-
+    // --- УПРАВЛЕНИЕ НАВИГАЦИЕЙ (ЭКРАНЫ) ---
     function openCategory(cat) {
-        currentCategory = cat.id;
-        isProfileActive = false;
-        isShowingHistory = false; 
-        mainViewport.style.display = 'none';
-        profileContainer.style.display = 'none';
-        taskContainer.style.display = 'flex';
-        
-        backBtn.style.display = 'block';
-        addActionBtn.style.display = 'block';
-        historyBtn.style.display = 'block'; 
-        editOrderBtn.style.display = 'none';
-        profileBtn.style.display = 'none';
-        themeToggleBtn.style.display = 'none';
-        
-        mainTitle.textContent = "BOARD";
-        subTitle.textContent = "План реализации";
-        actionSheetTitle.textContent = cat.title;
-        renderTasks();
-    }
-
-    function openProfile() {
-        isProfileActive = true;
-        currentCategory = null;
-        if (isEditMode) toggleEditMode();
-
-        mainViewport.style.display = 'none';
-        taskContainer.style.display = 'none';
-        profileContainer.style.display = 'flex';
-
-        backBtn.style.display = 'block';
-        addActionBtn.style.display = 'none';
-        historyBtn.style.display = 'none';
-        editOrderBtn.style.display = 'none';
-        profileBtn.style.display = 'none';
-        themeToggleBtn.style.display = 'none';
-
-        subTitle.textContent = "Личная аналитика";
-        renderProfileStats();
-    }
-    profileBtn.addEventListener('click', openProfile);
-
-    function goHome() {
-        currentCategory = null;
+        currentCategory = cat;
         isProfileActive = false;
         isShowingHistory = false;
-        mainViewport.style.display = 'block';
-        taskContainer.style.display = 'none';
-        profileContainer.style.display = 'none';
         
-        backBtn.style.display = 'none';
-        addActionBtn.style.display = 'none';
-        historyBtn.style.display = 'none';
-        editOrderBtn.style.display = 'block';
-        profileBtn.style.display = 'block';
-        themeToggleBtn.style.display = 'flex';
-        
-        subTitle.textContent = "СФЕРЫ ЖИЗНИ";
-        renderCategoriesGrid();
+        mainViewport.style.display = "none";
+        profileContainer.style.display = "none";
+        taskContainer.style.display = "flex";
+
+        backBtn.style.display = "block";
+        addActionBtn.style.display = "block";
+        historyBtn.style.display = "block";
+        editOrderBtn.style.display = "none";
+        profileBtn.style.display = "none";
+
+        mainTitle.innerText = cat.title;
+        subTitle.innerText = "Цели и визуализация";
+        renderTodos();
     }
-    backBtn.addEventListener('click', goHome);
+
+    function goBack() {
+        currentCategory = null;
+        isProfileActive = false;
+        
+        taskContainer.style.display = "none";
+        profileContainer.style.display = "none";
+        mainViewport.style.display = "block";
+
+        backBtn.style.display = "none";
+        addActionBtn.style.display = "none";
+        historyBtn.style.display = "none";
+        editOrderBtn.style.display = "block";
+        profileBtn.style.display = "block";
+
+        mainTitle.innerText = "BOARD";
+        subTitle.innerText = "СФЕРЫ ЖИЗНИ";
+        
+        historyBtn.classList.remove('active');
+        renderCategories();
+    }
+
+    backBtn.addEventListener('click', goBack);
+    mainTitle.addEventListener('click', goBack);
 
     historyBtn.addEventListener('click', () => {
         isShowingHistory = !isShowingHistory;
-        renderTasks();
+        historyBtn.classList.toggle('active', isShowingHistory);
+        subTitle.innerText = isShowingHistory ? "Архив выполненных" : "Цели и визуализация";
+        renderTodos();
     });
 
-    function renderProfileStats() {
-        document.getElementById('profileName').textContent = userProfile.name || "Профиль";
+    // Режим удаления/сортировки сфер
+    editOrderBtn.addEventListener('click', () => {
+        isEditMode = !isEditMode;
+        editOrderBtn.classList.toggle('active', isEditMode);
+        document.getElementById('categoriesGrid').classList.toggle('edit-mode-active', isEditMode);
+    });
 
-        const mottoEl = document.getElementById('profileMottoText');
+    // --- ЭКРАН ПРОФИЛЯ И СТАТИСТИКА ---
+    profileBtn.addEventListener('click', () => {
+        isProfileActive = true;
+        currentCategory = null;
+
+        mainViewport.style.display = "none";
+        taskContainer.style.display = "none";
+        profileContainer.style.display = "flex";
+
+        backBtn.style.display = "block";
+        editOrderBtn.style.display = "none";
+        profileBtn.style.display = "none";
+
+        mainTitle.innerText = "ПРОФИЛЬ";
+        subTitle.innerText = "Личный прогресс";
+
+        renderProfile();
+        calculateStats();
+    });
+
+    function renderProfile() {
+        document.getElementById('profileName').innerText = userProfile.name || "Пользователь";
+        const mottoText = document.getElementById('profileMottoText');
         if (userProfile.motto) {
-            mottoEl.textContent = userProfile.motto;
-            mottoEl.style.opacity = "1";
-            mottoEl.style.fontStyle = "italic";
+            mottoText.innerText = userProfile.motto;
+            mottoText.style.opacity = "1";
         } else {
-            mottoEl.textContent = "Введите цель...";
-            mottoEl.style.opacity = "0.4";
-            mottoEl.style.fontStyle = "normal";
+            mottoText.innerText = "Введите цель...";
+            mottoText.style.opacity = "0.5";
         }
-
-        // Рендеринг статуса системных уведомлений
-        const statusTextEl = document.getElementById('notificationStatusText');
-        if ("Notification" in window && Notification.permission === "granted") {
-            statusTextEl.textContent = "Включены";
-            statusTextEl.style.color = "var(--success)";
-        } else {
-            statusTextEl.textContent = "Выкл";
-            statusTextEl.style.color = "var(--text-muted)";
-        }
-
-        const avatarContainer = document.getElementById('profileAvatar');
-        const fallbackSpan = document.getElementById('avatarFallback');
         
-        const oldImg = avatarContainer.querySelector('img');
-        if (oldImg) oldImg.remove();
-
+        const fallback = document.getElementById('avatarFallback');
         if (userProfile.avatar) {
-            fallbackSpan.style.display = 'none';
-            const img = document.createElement('img');
-            img.src = userProfile.avatar;
-            avatarContainer.insertBefore(img, avatarContainer.firstChild);
+            fallback.innerHTML = `<img src="${userProfile.avatar}">`;
         } else {
-            fallbackSpan.style.display = 'block';
-            fallbackSpan.textContent = userProfile.name ? userProfile.name.charAt(0).toUpperCase() : 'P';
+            fallback.innerText = (userProfile.name || "P").charAt(0).toUpperCase();
         }
+    }
 
-        let totalGoals = 0;
-        let completedGoals = 0;
-        const balanceListContainer = document.getElementById('balanceListContainer');
-        balanceListContainer.innerHTML = '';
+    function calculateStats() {
+        let total = 0;
+        let completed = 0;
+
+        balanceListContainer.innerHTML = "";
 
         categories.forEach(cat => {
-            const activeList = allTodos[cat.id] || [];
-            const archiveList = allArchive[cat.id] || [];
-            
-            const total = activeList.length + archiveList.length;
-            const completed = archiveList.length;
+            const list = allTodos[cat.id] || [];
+            const tCount = list.length;
+            const cCount = list.filter(t => t.completed).length;
 
-            totalGoals += total;
-            completedGoals += completed;
+            total += tCount;
+            completed += cCount;
 
-            let percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+            const percent = tCount > 0 ? Math.round((cCount / tCount) * 100) : 0;
 
             const item = document.createElement('div');
-            item.className = 'balance-item';
+            item.className = "balance-item";
             item.innerHTML = `
                 <div class="balance-info-row">
                     <span class="balance-cat-name">${cat.title}</span>
-                    <span class="balance-cat-percent">${completed}/${total} (${percentage}%)</span>
+                    <span class="balance-cat-percent">${percent}%</span>
                 </div>
                 <div class="balance-progress-bg">
-                    <div class="balance-progress-fill" style="width: ${percentage}%; background-color: ${cat.color === '#FFFFFF' ? 'var(--accent)' : cat.color}; filter: brightness(0.85);"></div>
+                    <div class="balance-progress-fill" style="width: ${percent}%; background-color: ${cat.color === '#FFFFFF' ? 'var(--accent)' : 'var(--text-main)'}"></div>
                 </div>
             `;
             balanceListContainer.appendChild(item);
         });
 
-        document.getElementById('statTotalGoals').textContent = totalGoals;
-        document.getElementById('statCompletedGoals').textContent = completedGoals;
+        document.getElementById('statTotalGoals').innerText = total;
+        document.getElementById('statCompletedGoals').innerText = completed;
 
-        let rank = "Новичок фокуса";
-        if (completedGoals >= 5 && completedGoals < 15) rank = "Создатель реальности";
-        else if (completedGoals >= 15) rank = "Магистр баланса 👑";
-        document.getElementById('profileRank').textContent = rank;
+        // Присвоение рангов
+        const rankNode = document.getElementById('profileRank');
+        if (completed >= 15) rankNode.innerText = "Магистр реальности";
+        else if (completed >= 5) rankNode.innerText = "Адепт дисциплины";
+        else rankNode.innerText = "Новичок фокуса";
     }
 
-    // Логика подсистемы локальных Push-уведомлений
-    document.getElementById('notificationToggleBtn').addEventListener('click', () => {
-        if (!("Notification" in window)) {
-            alert("Ваш браузер или устройство не поддерживает веб-уведомления.");
-            return;
+    // Редактирование имени, девиза и аватара
+    document.getElementById('profileNameRow').addEventListener('click', () => {
+        const newName = prompt("Введите ваше имя:", userProfile.name);
+        if (newName !== null) {
+            userProfile.name = newName.trim() || "Профиль";
+            saveData();
+            renderProfile();
         }
-
-        Notification.requestPermission().then(permission => {
-            if (permission === "granted") {
-                new Notification("Фокус настроен", {
-                    body: "Уведомления успешно подключены. Мы будем напоминать вам о целях.",
-                    icon: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23007AFF'><circle cx='12' cy='12' r='10'/></svg>"
-                });
-            } else {
-                alert("Доступ к уведомлениям отклонен. Вы можете включить их в системных настройках браузера.");
-            }
-            renderProfileStats();
-        });
     });
 
-    // Логика экспорта Резервной Копии (Бэкап в JSON)
-    document.getElementById('exportBackupBtn').addEventListener('click', () => {
-        const backupData = {
-            categories: categories,
-            allTodos: allTodos,
-            allArchive: allArchive,
-            userProfile: userProfile,
-            exportVersion: "2026.1"
-        };
+    document.getElementById('profileMottoBox').addEventListener('click', () => {
+        const newMotto = prompt("Каков ваш главный фокус / девиз?", userProfile.motto);
+        if (newMotto !== null) {
+            userProfile.motto = newMotto.trim();
+            saveData();
+            renderProfile();
+        }
+    });
 
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData));
+    const avatarFileInput = document.getElementById('avatarFileInput');
+    document.getElementById('profileAvatar').addEventListener('click', () => avatarFileInput.click());
+    avatarFileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            userProfile.avatar = event.target.result;
+            saveData();
+            renderProfile();
+        };
+        reader.readAsDataURL(file);
+    });
+
+    // ---ОБРАБОТКА ДИАЛОГОВЫХ ОКОН (СОЗДАНИЕ ЦЕЛЕЙ)---
+    addActionBtn.addEventListener('click', () => {
+        actionSheetOverlay.classList.add('active');
+    });
+
+    document.getElementById('actionCancel').addEventListener('click', () => {
+        actionSheetOverlay.classList.remove('active');
+    });
+
+    document.getElementById('actionAddText').addEventListener('click', () => {
+        actionSheetOverlay.classList.remove('active');
+        modalMode = "todoText";
+        pendingImageBase64 = null;
+        document.getElementById('modalTitleText').innerText = "Новая цель";
+        document.getElementById('modalSubtitleText').innerText = "Разбейте цель на шаги через запятую для создания плана";
+        modalTextInput.value = "";
+        modalTextInput.placeholder = "Купить новый ноутбук...";
+        modalPlanInput.style.display = "block";
+        modalPlanInput.value = "";
+        inputModalOverlay.classList.add('active');
+    });
+
+    const globalFileInput = document.getElementById('globalFileInput');
+    document.getElementById('actionUploadPhoto').addEventListener('click', () => {
+        actionSheetOverlay.classList.remove('active');
+        globalFileInput.click();
+    });
+
+    globalFileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            pendingImageBase64 = event.target.result;
+            modalMode = "todoPhoto";
+            document.getElementById('modalTitleText').innerText = "Цель с визуализацией";
+            document.getElementById('modalSubtitleText').innerText = "Укажите название и план для загруженного фото";
+            modalTextInput.value = "";
+            modalTextInput.placeholder = "Описание вашей мечты...";
+            modalPlanInput.style.display = "block";
+            modalPlanInput.value = "";
+            inputModalOverlay.classList.add('active');
+        };
+        reader.readAsDataURL(file);
+    });
+
+    // Кнопки закрытия модалки
+    document.getElementById('modalCancelBtn').addEventListener('click', () => {
+        inputModalOverlay.classList.remove('active');
+    });
+
+    // Сохранение модалки (Сферы или Цели)
+    document.getElementById('modalSaveBtn').addEventListener('click', () => {
+        const textVal = modalTextInput.value.trim();
+        if (!textVal) return;
+
+        if (modalMode === "category") {
+            const newId = "cat_" + Date.now();
+            // Генерируем пастельный случайный цвет для карточки
+            const colors = ["#FFF9E6", "#E6F7ED", "#FCE8E6", "#E6F0FA", "#EAF2F8", "#F5E6FA"];
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            
+            categories.push({ id: newId, title: textVal, color: randomColor });
+            saveData();
+            renderCategories();
+        } 
+        else if (modalMode === "todoText" || modalMode === "todoPhoto") {
+            if (!allTodos[currentCategory.id]) allTodos[currentCategory.id] = [];
+            
+            const steps = modalPlanInput.value.split(',')
+                .map(s => s.trim())
+                .filter(s => s.length > 0)
+                .map(s => ({ text: s, completed: false }));
+
+            allTodos[currentCategory.id].push({
+                text: textVal,
+                completed: false,
+                image: pendingImageBase64,
+                steps: steps
+            });
+            saveData();
+            renderTodos();
+        } 
+        else if (modalMode === "editTodo") {
+            const todo = allTodos[currentCategory.id][editingTodoIndex];
+            todo.text = textVal;
+            todo.steps = modalPlanInput.value.split(',')
+                .map(s => s.trim())
+                .filter(s => s.length > 0)
+                .map(s => ({ text: s, completed: s.completed || false }));
+            
+            saveData();
+            renderTodos();
+        }
+
+        inputModalOverlay.classList.remove('active');
+    });
+
+    // --- БЕКАПЫ И СБРОС ---
+    document.getElementById('exportBackupBtn').addEventListener('click', () => {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({
+            categories, allTodos, userProfile
+        }));
         const downloadAnchor = document.createElement('a');
         downloadAnchor.setAttribute("href", dataStr);
         downloadAnchor.setAttribute("download", "vision_board_backup.json");
@@ -1324,385 +1428,45 @@
         downloadAnchor.remove();
     });
 
-    // Логика импорта Резервной Копии
-    document.getElementById('importBackupBtn').addEventListener('click', () => {
-        backupFileInput.click();
-    });
-
+    const backupFileInput = document.getElementById('backupFileInput');
+    document.getElementById('importBackupBtn').addEventListener('click', () => backupFileInput.click());
     backupFileInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file) return;
-
         const reader = new FileReader();
         reader.onload = function(event) {
             try {
                 const parsed = JSON.parse(event.target.result);
-                
-                if (parsed.categories && parsed.allTodos) {
-                    if (confirm("Вы уверены, что хотите развернуть эту резервную копию? Все текущие цели в приложении будут заменены.")) {
-                        categories = parsed.categories;
-                        allTodos = parsed.allTodos;
-                        allArchive = parsed.allArchive || {};
-                        userProfile = parsed.userProfile || { name: "", motto: "", avatar: "" };
-                        
-                        saveData();
-                        renderProfileStats();
-                        alert("Данные успешно импортированы!");
-                    }
-                } else {
-                    alert("Ошибка: Некорректная структура файла резервной копии.");
-                }
-            } catch (err) {
-                alert("Не удалось прочитать JSON-файл. Убедитесь, что файл не поврежден.");
+                if (parsed.categories) categories = parsed.categories;
+                if (parsed.allTodos) allTodos = parsed.allTodos;
+                if (parsed.userProfile) userProfile = parsed.userProfile;
+                saveData();
+                alert('Данные успешно импортированы!');
+                window.location.reload();
+            } catch(err) {
+                alert('Ошибка при импорте файла json.');
             }
-            backupFileInput.value = '';
         };
         reader.readAsText(file);
     });
 
-    function renderTasks() {
-        taskList.innerHTML = '';
-        
-        if (isShowingHistory) {
-            historyBtn.classList.add('active');
-            addActionBtn.style.display = 'none'; 
-            subTitle.textContent = "История успехов";
-
-            const archivedTasks = allArchive[currentCategory] || [];
-            
-            if (archivedTasks.length === 0) {
-                taskList.innerHTML = `
-                    <div style="text-align: center; color: var(--text-muted); padding: 40px 20px; font-size: 14px; font-weight: 500; line-height: 1.5;">
-                        В этой категории пока нет завершенных побед.<br>Выполняйте цели на основном экране, и они появятся здесь.
-                    </div>
-                `;
-                return;
-            }
-
-            archivedTasks.forEach((task, aIndex) => {
-                const li = document.createElement('li');
-                li.className = 'task-item completed';
-                
-                let planHtml = '';
-                if (task.steps && task.steps.length > 0) {
-                    planHtml = `<div class="action-plan-box"><div class="plan-title">Было реализовано:</div>`;
-                    task.steps.forEach(step => {
-                        planHtml += `
-                            <div class="sub-step-item sub-completed" style="pointer-events: none;">
-                                <div class="sub-step-checkbox"></div>
-                                <span class="sub-step-text">${step.text}</span>
-                            </div>
-                        `;
-                    });
-                    planHtml += `</div>`;
-                }
-
-                li.innerHTML = `
-                    <div class="task-body">
-                        <div class="task-main-row">
-                            <div class="custom-checkbox" onclick="restoreTaskFromArchive(${aIndex})" title="Вернуть цель в активные"></div>
-                            <div class="task-clickable-zone" onclick="restoreTaskFromArchive(${aIndex})" title="Вернуть цель в активные">
-                                ${task.text ? `<span class="task-text" style="color: var(--text-muted);">${task.text}</span>` : ''}
-                                ${task.image ? `<img src="${task.image}" class="task-media" alt="Фото" style="opacity: 0.4;">` : ''}
-                                <div style="font-size: 11px; color: var(--text-muted); margin-top: 5px; font-weight: 600;">Выполнено: ${task.archivedAt || 'Ранее'}</div>
-                            </div>
-                        </div>
-                        ${planHtml}
-                    </div>
-                    <div class="task-actions">
-                        <button class="delete-task-btn" onclick="deleteArchivedTask(${aIndex})" title="Удалить из истории навсегда">&times;</button>
-                    </div>
-                `;
-                taskList.appendChild(li);
-            });
-
-        } else {
-            historyBtn.classList.remove('active');
-            addActionBtn.style.display = 'block';
-            subTitle.textContent = "План реализации";
-
-            const tasks = allTodos[currentCategory] || [];
-            
-            if (tasks.length === 0) {
-                taskList.innerHTML = `
-                    <div style="text-align: center; color: var(--text-muted); padding: 40px 20px; font-size: 14px; font-weight: 500;">
-                        Здесь пока пусто. Нажмите «+» вверху,<br>чтобы добавить свою первую цель.
-                    </div>
-                `;
-                return;
-            }
-
-            tasks.forEach((task, tIndex) => {
-                const li = document.createElement('li');
-                li.className = 'task-item';
-                
-                let planHtml = '';
-                if (task.steps && task.steps.length > 0) {
-                    planHtml = `<div class="action-plan-box"><div class="plan-title">План реализации:</div>`;
-                    task.steps.forEach((step, sIndex) => {
-                        planHtml += `
-                            <div class="sub-step-item ${step.completed ? 'sub-completed' : ''}" onclick="toggleSubStep(${tIndex}, ${sIndex}, event)">
-                                <div class="sub-step-checkbox"></div>
-                                <span class="sub-step-text">${step.text}</span>
-                            </div>
-                        `;
-                    });
-                    planHtml += `</div>`;
-                }
-
-                li.innerHTML = `
-                    <div class="task-body">
-                        <div class="task-main-row">
-                            <div class="custom-checkbox" onclick="autoArchiveTask(${tIndex})"></div>
-                            <div class="task-clickable-zone" onclick="openEditTaskModal(${tIndex})">
-                                ${task.text ? `<span class="task-text">${task.text}</span>` : ''}
-                                ${task.image ? `<img src="${task.image}" class="task-media" alt="Фото">` : ''}
-                            </div>
-                        </div>
-                        ${planHtml}
-                    </div>
-                    <div class="task-actions">
-                        <button class="edit-task-btn" onclick="openEditTaskModal(${tIndex})" title="Редактировать">✎</button>
-                        <button class="delete-task-btn" onclick="deleteTask(${tIndex})" title="Удалить">&times;</button>
-                    </div>
-                `;
-                taskList.appendChild(li);
-            });
-        }
-    }
-
-    window.openEditTaskModal = function(index) {
-        modalMode = "edit-todo";
-        editingTodoIndex = index;
-        const task = allTodos[currentCategory][index];
-        modalPlanInput.style.display = "block";
-        modalTextInput.value = task.text || "";
-        modalPlanInput.value = task.steps ? task.steps.map(s => s.text).join(', ') : "";
-        openInputModal("Редактировать цель", "Измените описание или шаги плана:", "Например: Купить машину");
-    };
-
-    window.toggleSubStep = function(tIndex, sIndex, event) {
-        event.stopPropagation(); 
-        const task = allTodos[currentCategory][tIndex];
-        task.steps[sIndex].completed = !task.steps[sIndex].completed;
-        saveData();
-        renderTasks();
-    };
-
-    window.autoArchiveTask = function(index) {
-        const task = allTodos[currentCategory][index];
-        task.completed = true;
-        
-        const currentDateStr = new Date().toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' });
-        task.archivedAt = currentDateStr;
-
-        if (!allArchive[currentCategory]) allArchive[currentCategory] = [];
-        allArchive[currentCategory].push(task);
-
-        allTodos[currentCategory].splice(index, 1);
-        
-        saveData();
-        renderTasks();
-    };
-
-    window.restoreTaskFromArchive = function(index) {
-        const task = allArchive[currentCategory][index];
-        task.completed = false;
-        delete task.archivedAt;
-
-        if (!allTodos[currentCategory]) allTodos[currentCategory] = [];
-        allTodos[currentCategory].push(task);
-
-        allArchive[currentCategory].splice(index, 1);
-
-        saveData();
-        renderTasks();
-    };
-
-    addActionBtn.addEventListener('click', () => actionSheetOverlay.classList.add('active'));
-    function closeActionSheet() { actionSheetOverlay.classList.remove('active'); }
-    actionSheetOverlay.addEventListener('click', (e) => { if (e.target === actionSheetOverlay) closeActionSheet(); });
-    actionCancel.addEventListener('click', closeActionSheet);
-
-    function openInputModal(title, subtitle, placeholderText) {
-        modalTitleText.textContent = title;
-        modalSubtitleText.textContent = subtitle;
-        modalTextInput.placeholder = placeholderText;
-        inputModalOverlay.classList.add('active');
-        setTimeout(() => modalTextInput.focus(), 150);
-    }
-    function closeInputModal() { inputModalOverlay.classList.remove('active'); modalTextInput.blur(); }
-    modalCancelBtn.addEventListener('click', closeInputModal);
-
-    actionAddText.addEventListener('click', () => {
-        closeActionSheet();
-        pendingImageBase64 = null;
-        modalMode = "todo";
-        modalPlanInput.style.display = "block";
-        modalTextInput.value = "";
-        modalPlanInput.value = "";
-        setTimeout(() => openInputModal("Новая цель", "Опишите цель и шаги к ней через запятую:", "Например: Начать утренние пробежки"), 200);
-    });
-
-    actionUploadPhoto.addEventListener('click', () => { closeActionSheet(); globalFileInput.click(); });
-
-    globalFileInput.addEventListener('change', (event) => {
-        const file = event.target.files[0];
-        if (!file || !currentCategory) return;
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const img = new Image();
-            img.onload = function() {
-                const canvas = document.createElement('canvas');
-                const MAX_WIDTH = 1200; const MAX_HEIGHT = 1200;
-                let width = img.width; let height = img.height;
-                if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } }
-                else { if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; } }
-                canvas.width = width; canvas.height = height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, width, height);
-                pendingImageBase64 = canvas.toDataURL('image/jpeg', 0.85);
-                modalMode = "todo";
-                modalPlanInput.style.display = "block";
-                modalTextInput.value = "";
-                modalPlanInput.value = "";
-                openInputModal("Визуализация цели", "Опишите картинку и шаги плана через запятую:", "Например: Поездка к морю");
-                globalFileInput.value = '';
-            };
-            img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-    });
-
-    modalSaveBtn.addEventListener('click', () => {
-        const textVal = modalTextInput.value.trim();
-        const planVal = modalPlanInput.value.trim();
-        
-        if (modalMode === "category") {
-            if (!textVal) return closeInputModal();
-            const colors = ["#FFF9E6", "#E6F7ED", "#FCE8E6", "#E6F0FA", "#EAF2F8", "#F5E6FA"];
-            const randomColor = colors[Math.floor(Math.random() * colors.length)];
-            categories.push({ id: "custom_" + Date.now(), title: textVal, color: randomColor });
-            saveData(); renderCategoriesGrid(); closeInputModal();
-        } else if (modalMode === "todo") {
-            if (!textVal && !pendingImageBase64) return closeInputModal();
-            let parsedSteps = [];
-            if (planVal) {
-                parsedSteps = planVal.split(',').map(s => s.trim()).filter(s => s.length > 0).map(s => ({ text: s, completed: false }));
-            }
-            if (!allTodos[currentCategory]) allTodos[currentCategory] = [];
-            allTodos[currentCategory].push({ text: textVal, image: pendingImageBase64, steps: parsedSteps, completed: false });
-            saveData(); renderTasks(); closeInputModal(); pendingImageBase64 = null;
-        } else if (modalMode === "edit-todo") {
-            const currentTasks = allTodos[currentCategory] || [];
-            if (!textVal && !currentTasks[editingTodoIndex].image) return closeInputModal();
-            const oldTask = currentTasks[editingTodoIndex];
-            let parsedSteps = [];
-            if (planVal) {
-                parsedSteps = planVal.split(',').map(s => s.trim()).filter(s => s.length > 0).map(s => {
-                    const oldStep = oldTask.steps ? oldTask.steps.find(os => os.text === s) : null;
-                    return { text: s, completed: oldStep ? oldStep.completed : false };
-                });
-            }
-            oldTask.text = textVal; oldTask.steps = parsedSteps;
-            saveData(); renderTasks(); closeInputModal(); editingTodoIndex = null;
-        } else if (modalMode === "edit-motto") {
-            userProfile.motto = textVal; 
-            saveData(); renderProfileStats(); closeInputModal();
-        } else if (modalMode === "edit-name") {
-            userProfile.name = textVal;
-            saveData(); renderProfileStats(); closeInputModal();
+    document.getElementById('profileResetBtn').addEventListener('click', () => {
+        if (confirm('Внимание! Это полностью удалит все сферы, загруженные картинки и обнулит статистику профиля. Продолжить?')) {
+            localStorage.clear();
+            window.location.reload();
         }
     });
-
-    window.deleteTask = function(index) {
-        if (confirm("Удалить эту цель?")) {
-            allTodos[currentCategory].splice(index, 1);
-            saveData(); renderTasks();
-        }
-    };
-
-    window.deleteArchivedTask = function(index) {
-        if (confirm("Удалить цель из архива навсегда? Данные спишутся из статистики профиля.")) {
-            allArchive[currentCategory].splice(index, 1);
-            saveData(); renderTasks();
-        }
-    };
-
-    document.getElementById('profileAvatar').addEventListener('click', () => {
-        avatarFileInput.click();
-    });
-
-    avatarFileInput.addEventListener('change', (event) => {
-        const file = event.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const img = new Image();
-            img.onload = function() {
-                const canvas = document.createElement('canvas');
-                const size = 240; 
-                canvas.width = size; canvas.height = size;
-                const ctx = canvas.getContext('2d');
-                const side = Math.min(img.width, img.height);
-                ctx.drawImage(img, (img.width - side) / 2, (img.height - side) / 2, side, side, 0, 0, size, size);
-                userProfile.avatar = canvas.toDataURL('image/jpeg', 0.85);
-                saveData(); renderProfileStats(); avatarFileInput.value = '';
-            };
-            img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-    });
-
-    document.getElementById('profileNameRow').addEventListener('click', () => {
-        modalMode = "edit-name";
-        modalPlanInput.style.display = "none";
-        modalTextInput.value = userProfile.name;
-        openInputModal("Никнейм профиля", "Введите имя для отображения:", "Например: Укажите ваше имя...");
-    });
-
-    document.getElementById('profileMottoBox').addEventListener('click', () => {
-        modalMode = "edit-motto";
-        modalPlanInput.style.display = "none";
-        modalTextInput.value = userProfile.motto;
-        openInputModal("Главная цель", "Укажите ваш главный вектор развития:", "Введите цель...");
-    });
-
-    function deleteCategory(id, event) {
-        if (event) event.stopPropagation();
-        if (confirm("Удалить эту сферу, а также все активные и архивные цели внутри нее?")) {
-            categories = categories.filter(c => c.id !== id);
-            delete allTodos[id];
-            delete allArchive[id];
-            saveData(); renderCategoriesGrid();
-        }
-    }
 
     function saveData() {
         localStorage.setItem('premiumCategoriesList', JSON.stringify(categories));
         localStorage.setItem('premiumBoardTodos', JSON.stringify(allTodos));
-        localStorage.setItem('premiumBoardArchive', JSON.stringify(allArchive));
         localStorage.setItem('premiumUserProfile', JSON.stringify(userProfile));
     }
 
-    document.getElementById('profileResetBtn').addEventListener('click', () => {
-        if (confirm("Сбросить приложение? Это навсегда сотрет все созданные сферы, историю целей, фотографии и настройки профиля.")) {
-            localStorage.clear();
-            categories = defaultCategories; 
-            allTodos = {}; 
-            allArchive = {};
-            userProfile = { name: "", motto: "", avatar: "" };
-            isEditMode = false; 
-            document.body.classList.remove('dark');
-            updateThemeIcon(false);
-            goHome();
-        }
-    });
-
-    renderCategoriesGrid();
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js').then(() => console.log('PWA OK')).catch(err => console.log('PWA ERR', err));
-    }
+    // Инициализация при старте
+    renderCategories();
+    initNotifications();
 </script>
+
 </body>
 </html>
