@@ -8,6 +8,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Vision Board">
+    <meta name="theme-color" id="metaThemeColor" content="#F6F8FA">
     
     <style>
         :root {
@@ -22,7 +23,6 @@
             --settings-btn-bg: #F2F2F7;
         }
 
-        /* Стили для темной темы */
         body.dark {
             --bg-color: #1C1C1E;
             --card-bg: #2C2C2E;
@@ -61,11 +61,10 @@
         .header {
             background-color: var(--bg-color);
             padding: 50px 24px 16px;
-            /* Используем Grid вместо Flex */
             display: grid;
-            grid-template-columns: 1fr auto; /* Заголовок занимает всё место, кнопки — только сколько нужно */
+            grid-template-columns: 1fr auto; 
             align-items: start;
-            gap: 10px; /* Отступ между текстом и кнопками */
+            gap: 10px; 
             position: relative;
             z-index: 10;
         }
@@ -73,7 +72,7 @@
         .header-left {
             display: flex;
             flex-direction: column;
-            min-width: 0; /* Важно: позволяет заголовку правильно сжиматься */
+            min-width: 0; 
         }
 
         #mainTitle {
@@ -81,7 +80,7 @@
             font-weight: 700;
             line-height: 1.1;
             color: var(--text-main);
-            word-wrap: break-word; /* Текст переносится на новую строку */
+            word-wrap: break-word; 
             cursor: pointer;
         }
 
@@ -89,7 +88,6 @@
             display: flex;
             gap: 12px;
             align-items: center;
-            /* Кнопки всегда остаются справа в своей колонке */
             justify-self: end;
             flex-shrink: 0;
         }
@@ -164,35 +162,22 @@
             border: 1px solid rgba(0,0,0,0.03);
             -webkit-tap-highlight-color: transparent;
             touch-action: auto;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s, border 0.2s, opacity 0.2s;
         }
 
         body.dark .grid-item {
             background-blend-mode: multiply;
-            background-color: rgba(255, 255, 255, 0.15) !important;
+            background-color: rgba(255, 255, 255, 0.05) !important;
         }
 
         .edit-mode-active .grid-item:not(.add-btn-card) {
-            border: 1.5px dashed var(--text-muted);
+            border: 1.5px dashed var(--accent);
             cursor: grab;
-            touch-action: none !important;
         }
 
         .grid-item.dragging {
-            position: fixed !important;
-            z-index: 1000 !important;
-            box-shadow: 0 16px 36px rgba(0,0,0,0.15) !important;
-            transform: scale(1.05);
-            opacity: 0.9;
-            pointer-events: none;
-            cursor: grabbing;
-        }
-
-        .grid-item-placeholder {
-            background: rgba(0, 0, 0, 0.03);
-            border: 2px dashed var(--border-color);
-            border-radius: 18px;
-            min-height: 125px;
+            opacity: 0.5;
+            border: 1.5px solid var(--accent);
         }
 
         .grid-text {
@@ -285,7 +270,7 @@
             text-decoration: line-through;
             color: var(--text-muted);
         }
-        .task-item.completed .task-media {
+        .task-item.completed .task-media-container {
             opacity: 0.5;
         }
 
@@ -294,6 +279,7 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
+            min-width: 0;
         }
 
         .task-main-row {
@@ -313,13 +299,26 @@
             line-height: 1.4;
         }
 
-        .task-media {
+        /* УМНАЯ СЕТКА ДЛЯ МУЛЬТИЗАГРУЗКИ ФОТО */
+        .task-media-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 6px;
             width: 100%;
-            max-height: 280px;
+        }
+        .task-media-item {
+            flex: 1 1 calc(50% - 4px);
+            min-width: 110px;
+            height: 130px;
             object-fit: cover;
-            border-radius: 14px;
+            border-radius: 12px;
             display: block;
-            margin-top: 4px;
+        }
+        /* Если загружена только 1 картинка, она развернется полноценно */
+        .task-media-item:only-child {
+            flex: 1 1 100%;
+            height: 260px;
         }
 
         .custom-checkbox {
@@ -507,11 +506,14 @@
             gap: 6px;
             margin-bottom: 6px;
             cursor: pointer;
-            padding: 2px 8px;
+            padding: 4px 12px;
             border-radius: 8px;
+            background: rgba(0,0,0,0.02);
             -webkit-tap-highlight-color: transparent;
+            transition: background-color 0.15s;
         }
-        .profile-name-row:active { background: rgba(0,0,0,0.03); }
+        body.dark .profile-name-row { background: rgba(255,255,255,0.04); }
+        .profile-name-row:active { opacity: 0.7; }
         .profile-name { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
         .profile-name-edit-icon { font-size: 14px; color: var(--text-muted); }
 
@@ -533,6 +535,7 @@
             cursor: pointer;
             -webkit-tap-highlight-color: transparent;
         }
+        .profile-motto-box:active { opacity: 0.6; }
         .profile-motto-label {
             font-size: 10px;
             font-weight: 700;
@@ -766,7 +769,7 @@
             user-select: text;
         }
         .modal-input:focus { border-color: var(--accent); }
-        .modal-textarea { resize: none; height: 70px; }
+        .modal-textarea { resize: none; height: 110px; }
         .modal-buttons { display: flex; gap: 10px; margin-top: 20px; }
         .modal-btn { flex: 1; padding: 12px; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; }
         .modal-btn.cancel { background: var(--bg-color); color: var(--text-muted); }
@@ -775,7 +778,8 @@
 </head>
 <body>
 
-<input type="file" id="globalFileInput" accept="image/*" style="display:none;">
+<!-- ДОБАВЛЕН MULTIPLE ДЛЯ ВЫБОРА НЕСКОЛЬКИХ ФОТО -->
+<input type="file" id="globalFileInput" accept="image/*" multiple style="display:none;">
 <input type="file" id="avatarFileInput" accept="image/*" style="display:none;">
 <input type="file" id="backupFileInput" accept=".json" style="display:none;">
 
@@ -822,13 +826,20 @@
                 <div class="profile-avatar-overlay">Фото</div>
             </div>
             <div class="profile-name-row" id="profileNameRow" title="Изменить никнейм">
-                <div class="profile-name" id="profileName">Профиль</div>
+                <div class="profile-name" id="profileName">Пользователь</div>
                 <div class="profile-name-edit-icon">✎</div>
             </div>
             <div class="profile-rank" id="profileRank">Новичок фокуса</div>
-            <div class="profile-motto-box" id="profileMottoBox">
+            
+            <div class="profile-motto-box" id="profileMottoBox" title="Изменить главный фокус">
                 <div class="profile-motto-label">Главный фокус</div>
                 <div class="profile-motto-text" id="profileMottoText" style="opacity: 0.5;">Введите цель...</div>
+            </div>
+
+            <!-- ДОБАВЛЕН БЛОК ЦЕЛИ НА ГОД -->
+            <div class="profile-motto-box" id="profileYearGoalBox" style="border-top: 1px solid var(--border-color); padding-top: 14px; margin-top: 14px;" title="Изменить цель на год">
+                <div class="profile-motto-label">Цель на год</div>
+                <div class="profile-motto-text" id="profileYearGoalText" style="opacity: 0.5;">Укажите главную цель на год...</div>
             </div>
         </div>
 
@@ -867,7 +878,7 @@
         <div class="action-sheet">
             <div class="action-sheet-title" id="actionSheetTitle">Новая цель</div>
             <button class="action-sheet-btn" id="actionAddText">📝 Обычная цель с планом</button>
-            <button class="action-sheet-btn" id="actionUploadPhoto">📸 Визуализация (Фото + План)</button>
+            <button class="action-sheet-btn" id="actionUploadPhoto">📸 Визуализация (Несколько фото + План)</button>
             <button class="action-sheet-btn cancel" id="actionCancel">Отмена</button>
         </div>
     </div>
@@ -879,7 +890,7 @@
             
             <div class="input-group">
                 <input type="text" class="modal-input" id="modalTextInput" placeholder="..." maxlength="100">
-                <textarea class="modal-input modal-textarea" id="modalPlanInput" placeholder="План действий: Шаг 1, Шаг 1, Шаг 3 (через запятую)..." style="display:none;"></textarea>
+                <textarea class="modal-input modal-textarea" id="modalPlanInput" placeholder="План действий:..."></textarea>
             </div>
 
             <div class="modal-buttons">
@@ -891,6 +902,61 @@
 </div>
 
 <script>
+    const DB_NAME = 'VisionBoardPWA_DB';
+    const DB_VERSION = 1;
+    let db = null;
+
+    function initDB() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(DB_NAME, DB_VERSION);
+            request.onupgradeneeded = (e) => {
+                const database = e.target.result;
+                if (!database.objectStoreNames.contains('store')) {
+                    database.createObjectStore('store');
+                }
+            };
+            request.onsuccess = (e) => {
+                db = e.target.result;
+                resolve();
+            };
+            request.onerror = (e) => reject(e.target.error);
+        });
+    }
+
+    function getKV(key, defaultValue) {
+        return new Promise((resolve) => {
+            const tx = db.transaction('store', 'readonly');
+            const store = tx.objectStore('store');
+            const request = store.get(key);
+            request.onsuccess = () => resolve(request.result !== undefined ? request.result : defaultValue);
+            request.onerror = () => resolve(defaultValue);
+        });
+    }
+
+    function setKV(key, value) {
+        return new Promise((resolve) => {
+            const tx = db.transaction('store', 'readwrite');
+            const store = tx.objectStore('store');
+            const request = store.put(value, key);
+            request.onsuccess = () => resolve();
+            request.onerror = () => resolve();
+        });
+    }
+
+    function clearAllDB() {
+        return new Promise((resolve) => {
+            const tx = db.transaction('store', 'readwrite');
+            const store = tx.objectStore('store');
+            const request = store.clear();
+            request.onsuccess = () => resolve();
+        });
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
     const defaultCategories = [
         { id: "cat_wealth", title: "Богатство и Успех", color: "#FFF9E6" },
         { id: "cat_health", title: "Здоровье и Спорт", color: "#E6F7ED" },
@@ -900,31 +966,19 @@
         { id: "cat_growth", title: "Саморазвитие", color: "#F5E6FA" }
     ];
 
-    let categories = JSON.parse(localStorage.getItem('premiumCategoriesList')) || defaultCategories;
-    let allTodos = JSON.parse(localStorage.getItem('premiumBoardTodos')) || {};
-    
-    // Изменено имя по умолчанию со "Слава" на "Пользователь"
-    let userProfile = JSON.parse(localStorage.getItem('premiumUserProfile')) || {
-        name: "Пользователь",
-        motto: "",
-        avatar: ""
-    };
-    
-    // Принудительный сброс старого кэшированного имени, если оно осталось в localStorage
-    if (userProfile.name === "Слава") {
-        userProfile.name = "Пользователь";
-        localStorage.setItem('premiumUserProfile', JSON.stringify(userProfile));
-    }
+    let categories = [];
+    let allTodos = {};
+    let userProfile = {};
     
     let currentCategory = null;
     let isProfileActive = false;
     let isShowingHistory = false; 
-    let pendingImageBase64 = null;
+    let pendingImagesArray = []; // Перевели хранилище в массив
     let modalMode = "category"; 
     let editingTodoIndex = null;
     let isEditMode = false;
+    let draggedId = null; 
 
-    // Ссылки на элементы DOM
     const mainViewport = document.getElementById('mainViewport');
     const categoriesGrid = document.getElementById('categoriesGrid');
     const taskContainer = document.getElementById('taskContainer');
@@ -932,25 +986,22 @@
     const profileContainer = document.getElementById('profileContainer');
     const balanceListContainer = document.getElementById('balanceListContainer');
 
-    // Кнопки шапки
     const backBtn = document.getElementById('backBtn');
     const addActionBtn = document.getElementById('addActionBtn');
     const profileBtn = document.getElementById('profileBtn');
     const editOrderBtn = document.getElementById('editOrderBtn');
     const themeToggleBtn = document.getElementById('themeToggleBtn');
     const historyBtn = document.getElementById('historyBtn');
+    const metaThemeColor = document.getElementById('metaThemeColor');
     
-    // Текстовые ноды шапки
     const mainTitle = document.getElementById('mainTitle');
     const subTitle = document.getElementById('subTitle');
 
-    // Модалки и листы
     const actionSheetOverlay = document.getElementById('actionSheetOverlay');
     const inputModalOverlay = document.getElementById('inputModalOverlay');
     const modalTextInput = document.getElementById('modalTextInput');
     const modalPlanInput = document.getElementById('modalPlanInput');
 
-    // --- СТРОГАЯ ЛОГИКА УВЕДОМЛЕНИЙ БЕЗ СЛОВА "ВКЛЮЧЕНО" ---
     const notificationStatusText = document.getElementById('notificationStatusText');
     const notificationToggleBtn = document.getElementById('notificationToggleBtn');
 
@@ -970,17 +1021,17 @@
         });
     }
 
-    function initNotifications() {
-        let isEnabled = localStorage.getItem('premiumNotificationsActive') === 'true';
+    async function initNotifications() {
+        let isEnabled = (await getKV('premiumNotificationsActive', 'false')) === 'true';
         if (notificationStatusText) {
             notificationStatusText.innerText = isEnabled ? 'Вкл' : 'Выкл';
         }
     }
 
     notificationToggleBtn.addEventListener('click', async () => {
-        let isEnabled = localStorage.getItem('premiumNotificationsActive') === 'true';
+        let isEnabled = (await getKV('premiumNotificationsActive', 'false')) === 'true';
         if (isEnabled) {
-            localStorage.setItem('premiumNotificationsActive', 'false');
+            await setKV('premiumNotificationsActive', 'false');
             notificationStatusText.innerText = 'Выкл';
         } else {
             if (!('Notification' in window)) {
@@ -989,105 +1040,29 @@
             }
             const permission = await Notification.requestPermission();
             if (permission === 'granted') {
-                localStorage.setItem('premiumNotificationsActive', 'true');
+                await setKV('premiumNotificationsActive', 'true');
                 notificationStatusText.innerText = 'Вкл';
                 new Notification('Vision Board', { body: 'Напоминания активированы!' });
             }
         }
     });
 
-    // --- СМЕНА ТЕМЫ ОФОРМЛЕНИЯ ---
-    themeToggleBtn.addEventListener('click', () => {
+    function updateThemeMeta(isDark) {
+        if (metaThemeColor) {
+            metaThemeColor.setAttribute('content', isDark ? '#1C1C1E' : '#F6F8FA');
+        }
+    }
+
+    themeToggleBtn.addEventListener('click', async () => {
         document.body.classList.toggle('dark');
         const isDark = document.body.classList.contains('dark');
-        localStorage.setItem('premiumThemeDark', isDark ? 'true' : 'false');
-    });
-    if (localStorage.getItem('premiumThemeDark') === 'true') {
-        document.body.classList.add('dark');
-    }
-
-    // --- ЛОГИКА ПЕРЕНОСА СФЕР ЖИЗНИ (DRAG & DROP) ---
-    let draggedElement = null;
-    const placeholder = document.createElement('div');
-    placeholder.className = 'grid-item-placeholder';
-
-    categoriesGrid.addEventListener('pointerdown', (e) => {
-        if (!isEditMode) return;
-        const target = e.target.closest('.grid-item');
-        if (!target || target.classList.contains('add-btn-card')) return;
-        if (e.target.closest('.delete-cat-btn')) return;
-
-        draggedElement = target;
-        categoriesGrid.setPointerCapture(e.pointerId);
-
-        const rect = draggedElement.getBoundingClientRect();
-        draggedElement.classList.add('dragging');
-        draggedElement.style.width = rect.width + 'px';
-        draggedElement.style.height = rect.height + 'px';
-        draggedElement.style.left = rect.left + 'px';
-        draggedElement.style.top = rect.top + 'px';
-
-        draggedElement.parentNode.insertBefore(placeholder, draggedElement);
+        await setKV('premiumThemeDark', isDark ? 'true' : 'false');
+        updateThemeMeta(isDark);
     });
 
-    categoriesGrid.addEventListener('pointermove', (e) => {
-        if (!draggedElement) return;
-
-        const rect = placeholder.getBoundingClientRect();
-        draggedElement.style.left = (e.clientX - rect.width / 2) + 'px';
-        draggedElement.style.top = (e.clientY - rect.height / 2) + 'px';
-
-        draggedElement.style.pointerEvents = 'none';
-        const elementUnder = document.elementFromPoint(e.clientX, e.clientY);
-        draggedElement.style.pointerEvents = 'auto';
-
-        if (!elementUnder) return;
-        const closestItem = elementUnder.closest('.grid-item');
-
-        if (closestItem && closestItem !== draggedElement && !closestItem.classList.contains('add-btn-card')) {
-            const children = Array.from(categoriesGrid.children);
-            const draggedIdx = children.indexOf(placeholder);
-            const targetIdx = children.indexOf(closestItem);
-
-            if (draggedIdx < targetIdx) {
-                categoriesGrid.insertBefore(placeholder, closestItem.nextSibling);
-            } else {
-                categoriesGrid.insertBefore(placeholder, closestItem);
-            }
-        }
-    });
-
-    function endDrag(pointerId) {
-        if (!draggedElement) return;
-        if (pointerId !== undefined) {
-            categoriesGrid.releasePointerCapture(pointerId);
-        }
-
-        draggedElement.classList.remove('dragging');
-        draggedElement.style.width = '';
-        draggedElement.style.height = '';
-        draggedElement.style.left = '';
-        draggedElement.style.top = '';
-
-        if (placeholder.parentNode) {
-            placeholder.parentNode.insertBefore(draggedElement, placeholder);
-            placeholder.remove();
-        }
-
-        const currentItems = Array.from(categoriesGrid.querySelectorAll('.grid-item:not(.add-btn-card)'));
-        categories = currentItems.map(item => categories.find(c => c.id === item.dataset.id)).filter(Boolean);
-        saveData();
-
-        draggedElement = null;
-    }
-
-    categoriesGrid.addEventListener('pointerup', (e) => endDrag(e.pointerId));
-    categoriesGrid.addEventListener('pointercancel', (e) => endDrag(e.pointerId));
-
-    // --- РЕНДЕРИНГ КАТЕГОРИЙ ---
     function renderCategories() {
         categoriesGrid.innerHTML = "";
-        categories.forEach(cat => {
+        categories.forEach((cat) => {
             const todos = allTodos[cat.id] || [];
             const activeCount = todos.filter(t => !t.completed).length;
             
@@ -1096,18 +1071,52 @@
             card.style.backgroundColor = cat.color;
             card.dataset.id = cat.id;
 
+            if (isEditMode) {
+                card.setAttribute('draggable', 'true');
+            }
+
             card.innerHTML = `
                 <button class="delete-cat-btn">&times;</button>
-                <div class="grid-text">${cat.title}</div>
+                <div class="grid-text">${escapeHtml(cat.title)}</div>
                 <div class="badge">${activeCount} активных</div>
             `;
 
-            card.querySelector('.delete-cat-btn').addEventListener('click', (e) => {
+            card.addEventListener('dragstart', (e) => {
+                if (!isEditMode) { e.preventDefault(); return; }
+                draggedId = cat.id;
+                card.classList.add('dragging');
+            });
+
+            card.addEventListener('dragover', (e) => {
+                if (!isEditMode) return;
+                e.preventDefault(); 
+            });
+
+            card.addEventListener('drop', async (e) => {
+                if (!isEditMode) return;
+                e.preventDefault();
+                const targetId = card.dataset.id;
+                if (draggedId && draggedId !== targetId) {
+                    const fromIdx = categories.findIndex(c => c.id === draggedId);
+                    const toIdx = categories.findIndex(c => c.id === targetId);
+                    const [movedItem] = categories.splice(fromIdx, 1);
+                    categories.splice(toIdx, 0, movedItem);
+                    await saveData();
+                    renderCategories();
+                }
+            });
+
+            card.addEventListener('dragend', () => {
+                card.classList.remove('dragging');
+                draggedId = null;
+            });
+
+            card.querySelector('.delete-cat-btn').addEventListener('click', async (e) => {
                 e.stopPropagation();
                 if (confirm(`Удалить сферу "${cat.title}" и все её цели?`)) {
                     categories = categories.filter(c => c.id !== cat.id);
                     delete allTodos[cat.id];
-                    saveData();
+                    await saveData();
                     renderCategories();
                 }
             });
@@ -1120,7 +1129,6 @@
             categoriesGrid.appendChild(card);
         });
 
-        // Карточка добавления кастомной сферы
         const addCard = document.createElement('div');
         addCard.className = "grid-item add-btn-card";
         addCard.innerHTML = `<div class="grid-text">+ Добавить сферу</div>`;
@@ -1136,7 +1144,6 @@
         categoriesGrid.appendChild(addCard);
     }
 
-    // --- РЕНДЕРИНГ ЦЕЛЕЙ ---
     function renderTodos() {
         taskList.innerHTML = "";
         if (!currentCategory) return;
@@ -1149,7 +1156,7 @@
             return;
         }
 
-        filtered.forEach((todo, index) => {
+        filtered.forEach((todo) => {
             const actualIndex = list.indexOf(todo);
             const li = document.createElement('li');
             li.className = `task-item ${todo.completed ? 'completed' : ''}`;
@@ -1162,9 +1169,26 @@
                         ${todo.steps.map((step, sIdx) => `
                             <div class="sub-step-item ${step.completed ? 'sub-completed' : ''}" data-sidx="${sIdx}">
                                 <div class="sub-step-checkbox"></div>
-                                <div class="sub-step-text">${step.text}</div>
+                                <div class="sub-step-text">${escapeHtml(step.text)}</div>
                             </div>
                         `).join('')}
+                    </div>
+                `;
+            }
+
+            // Обработка обратной совместимости (одиночное фото vs массив фоток)
+            let itemImages = [];
+            if (todo.images && todo.images.length > 0) {
+                itemImages = todo.images;
+            } else if (todo.image) {
+                itemImages = [todo.image];
+            }
+
+            let imagesGalleryHtml = "";
+            if (itemImages.length > 0) {
+                imagesGalleryHtml = `
+                    <div class="task-media-container">
+                        ${itemImages.map(img => `<img src="${img}" class="task-media-item">`).join('')}
                     </div>
                 `;
             }
@@ -1174,10 +1198,10 @@
                     <div class="task-main-row">
                         <div class="custom-checkbox"></div>
                         <div class="task-clickable-zone">
-                            <div class="task-text">${todo.text}</div>
+                            <div class="task-text">${escapeHtml(todo.text)}</div>
                         </div>
                     </div>
-                    ${todo.image ? `<img src="${todo.image}" class="task-media">` : ''}
+                    ${imagesGalleryHtml}
                     ${stepsHtml}
                     <div class="task-actions">
                         <button class="edit-task-btn">✎ Правка</button>
@@ -1186,40 +1210,37 @@
                 </div>
             `;
 
-            // Чекбокс главной цели
-            li.querySelector('.custom-checkbox').addEventListener('click', () => {
+            li.querySelector('.custom-checkbox').addEventListener('click', async () => {
                 todo.completed = !todo.completed;
-                saveData();
+                await saveData();
                 renderTodos();
             });
 
-            // Клик по подшагам плана
             li.querySelectorAll('.sub-step-item').forEach(stepNode => {
-                stepNode.addEventListener('click', () => {
+                stepNode.addEventListener('click', async () => {
                     const sIdx = parseInt(stepNode.dataset.sidx);
                     todo.steps[sIdx].completed = !todo.steps[sIdx].completed;
-                    saveData();
+                    await saveData();
                     renderTodos();
                 });
             });
 
-            // Удаление цели
-            li.querySelector('.delete-task-btn').addEventListener('click', () => {
+            li.querySelector('.delete-task-btn').addEventListener('click', async () => {
                 if (confirm("Удалить эту цель?")) {
                     list.splice(actualIndex, 1);
-                    saveData();
+                    await saveData();
                     renderTodos();
                 }
             });
 
-            // Редактирование цели
             li.querySelector('.edit-task-btn').addEventListener('click', () => {
                 modalMode = "editTodo";
                 editingTodoIndex = actualIndex;
                 document.getElementById('modalTitleText').innerText = "Изменить цель";
                 modalTextInput.value = todo.text;
                 modalPlanInput.style.display = "block";
-                modalPlanInput.value = todo.steps ? todo.steps.map(s => s.text).join(', ') : "";
+                modalPlanInput.placeholder = "План действий (каждый шаг с новой строки)...";
+                modalPlanInput.value = todo.steps ? todo.steps.map(s => s.text).join('\n') : "";
                 inputModalOverlay.classList.add('active');
             });
 
@@ -1227,7 +1248,6 @@
         });
     }
 
-    // --- УПРАВЛЕНИЕ НАВИГАЦИЕЙ (ЭКРАНЫ) ---
     function openCategory(cat) {
         currentCategory = cat;
         isProfileActive = false;
@@ -1279,14 +1299,13 @@
         renderTodos();
     });
 
-    // Режим удаления/сортировки сфер
     editOrderBtn.addEventListener('click', () => {
         isEditMode = !isEditMode;
         editOrderBtn.classList.toggle('active', isEditMode);
         document.getElementById('categoriesGrid').classList.toggle('edit-mode-active', isEditMode);
+        renderCategories();
     });
 
-    // --- ЭКРАН ПРОФИЛЯ И СТАТИСТИКА ---
     profileBtn.addEventListener('click', () => {
         isProfileActive = true;
         currentCategory = null;
@@ -1308,6 +1327,8 @@
 
     function renderProfile() {
         document.getElementById('profileName').innerText = userProfile.name || "Пользователь";
+        
+        // Главный фокус
         const mottoText = document.getElementById('profileMottoText');
         if (userProfile.motto) {
             mottoText.innerText = userProfile.motto;
@@ -1316,19 +1337,28 @@
             mottoText.innerText = "Введите цель...";
             mottoText.style.opacity = "0.5";
         }
+
+        // Цель на год
+        const yearGoalText = document.getElementById('profileYearGoalText');
+        if (userProfile.yearGoal) {
+            yearGoalText.innerText = userProfile.yearGoal;
+            yearGoalText.style.opacity = "1";
+        } else {
+            yearGoalText.innerText = "Укажите главную цель на год...";
+            yearGoalText.style.opacity = "0.5";
+        }
         
         const fallback = document.getElementById('avatarFallback');
         if (userProfile.avatar) {
             fallback.innerHTML = `<img src="${userProfile.avatar}">`;
         } else {
-            fallback.innerText = (userProfile.name || "P").charAt(0).toUpperCase();
+            fallback.innerText = (userProfile.name || "Пользователь").charAt(0).toUpperCase();
         }
     }
 
     function calculateStats() {
         let total = 0;
         let completed = 0;
-
         balanceListContainer.innerHTML = "";
 
         categories.forEach(cat => {
@@ -1340,12 +1370,11 @@
             completed += cCount;
 
             const percent = tCount > 0 ? Math.round((cCount / tCount) * 100) : 0;
-
             const item = document.createElement('div');
             item.className = "balance-item";
             item.innerHTML = `
                 <div class="balance-info-row">
-                    <span class="balance-cat-name">${cat.title}</span>
+                    <span class="balance-cat-name">${escapeHtml(cat.title)}</span>
                     <span class="balance-cat-percent">${percent}%</span>
                 </div>
                 <div class="balance-progress-bg">
@@ -1358,30 +1387,43 @@
         document.getElementById('statTotalGoals').innerText = total;
         document.getElementById('statCompletedGoals').innerText = completed;
 
-        // Присвоение рангов
         const rankNode = document.getElementById('profileRank');
         if (completed >= 15) rankNode.innerText = "Магистр реальности";
         else if (completed >= 5) rankNode.innerText = "Адепт дисциплины";
         else rankNode.innerText = "Новичок фокуса";
     }
 
-    // Редактирование имени, девиза и аватара
+    // Изменение никнейма
     document.getElementById('profileNameRow').addEventListener('click', () => {
-        const newName = prompt("Введите ваше имя:", userProfile.name);
-        if (newName !== null) {
-            userProfile.name = newName.trim() || "Пользователь";
-            saveData();
-            renderProfile();
-        }
+        modalMode = "editProfileName";
+        document.getElementById('modalTitleText').innerText = "Изменить никнейм";
+        document.getElementById('modalSubtitleText').innerText = "Введите новое имя вашего профиля";
+        modalTextInput.value = userProfile.name || "Пользователь";
+        modalTextInput.placeholder = "Имя пользователя...";
+        modalPlanInput.style.display = "none";
+        inputModalOverlay.classList.add('active');
     });
 
+    // Безопасное изменение главного фокуса (девиза) через модалку
     document.getElementById('profileMottoBox').addEventListener('click', () => {
-        const newMotto = prompt("Каков ваш главный фокус / девиз?", userProfile.motto);
-        if (newMotto !== null) {
-            userProfile.motto = newMotto.trim();
-            saveData();
-            renderProfile();
-        }
+        modalMode = "editMotto";
+        document.getElementById('modalTitleText').innerText = "Главный фокус";
+        document.getElementById('modalSubtitleText').innerText = "Каков ваш основной девиз или кредо?";
+        modalTextInput.value = userProfile.motto || "";
+        modalTextInput.placeholder = "Только вперед...";
+        modalPlanInput.style.display = "none";
+        inputModalOverlay.classList.add('active');
+    });
+
+    // Безопасное изменение цели на год через модалку
+    document.getElementById('profileYearGoalBox').addEventListener('click', () => {
+        modalMode = "editYearGoal";
+        document.getElementById('modalTitleText').innerText = "Цель на год";
+        document.getElementById('modalSubtitleText').innerText = "Сформулируйте вашу главную стратегическую задачу на этот год";
+        modalTextInput.value = userProfile.yearGoal || "";
+        modalTextInput.placeholder = "Например: Выйти на доход X / Купить квартиру...";
+        modalPlanInput.style.display = "none";
+        inputModalOverlay.classList.add('active');
     });
 
     const avatarFileInput = document.getElementById('avatarFileInput');
@@ -1390,15 +1432,14 @@
         const file = e.target.files[0];
         if (!file) return;
         const reader = new FileReader();
-        reader.onload = function(event) {
+        reader.onload = async function(event) {
             userProfile.avatar = event.target.result;
-            saveData();
+            await saveData();
             renderProfile();
         };
         reader.readAsDataURL(file);
     });
 
-    // ---ОБРАБОТКА ДИАЛОГОВЫХ ОКОН (СОЗДАНИЕ ЦЕЛЕЙ)---
     addActionBtn.addEventListener('click', () => {
         actionSheetOverlay.classList.add('active');
     });
@@ -1410,12 +1451,13 @@
     document.getElementById('actionAddText').addEventListener('click', () => {
         actionSheetOverlay.classList.remove('active');
         modalMode = "todoText";
-        pendingImageBase64 = null;
+        pendingImagesArray = [];
         document.getElementById('modalTitleText').innerText = "Новая цель";
-        document.getElementById('modalSubtitleText').innerText = "Разбейте цель на шаги через запятую для создания плана";
+        document.getElementById('modalSubtitleText').innerText = "Разбейте цель на подпункты плана, начиная каждый с новой строки";
         modalTextInput.value = "";
         modalTextInput.placeholder = "Купить новый ноутбук...";
         modalPlanInput.style.display = "block";
+        modalPlanInput.placeholder = "План действий:&#10;Шаг 1&#10;Шаг 2&#10;(Каждый шаг с новой строки)";
         modalPlanInput.value = "";
         inputModalOverlay.classList.add('active');
     });
@@ -1426,48 +1468,84 @@
         globalFileInput.click();
     });
 
-    globalFileInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            pendingImageBase64 = event.target.result;
-            modalMode = "todoPhoto";
-            document.getElementById('modalTitleText').innerText = "Цель с визуализацией";
-            document.getElementById('modalSubtitleText').innerText = "Укажите название и план для загруженного фото";
-            modalTextInput.value = "";
-            modalTextInput.placeholder = "Описание вашей мечты...";
-            modalPlanInput.style.display = "block";
-            modalPlanInput.value = "";
-            inputModalOverlay.classList.add('active');
-        };
-        reader.readAsDataURL(file);
+    // ОБРАБОТЧИК МУЛЬТИЗАГРУЗКИ КАРТИНОК ИЗ ГАЛЕРЕИ
+    globalFileInput.addEventListener('change', async (e) => {
+        const files = Array.from(e.target.files);
+        if (files.length === 0) return;
+        
+        pendingImagesArray = [];
+        
+        // Читаем все выбранные файлы асинхронно
+        const filePromises = files.map(file => {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    pendingImagesArray.push(event.target.result);
+                    resolve();
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        await Promise.all(filePromises);
+
+        modalMode = "todoPhoto";
+        document.getElementById('modalTitleText').innerText = "Цель с визуализацией";
+        document.getElementById('modalSubtitleText').innerText = `Выбрано изображений: ${pendingImagesArray.length}. Заполните описание.`;
+        modalTextInput.value = "";
+        modalTextInput.placeholder = "Описание вашей мечты...";
+        modalPlanInput.style.display = "block";
+        modalPlanInput.placeholder = "План действий:&#10;Шаг 1&#10;Шаг 2";
+        modalPlanInput.value = "";
+        inputModalOverlay.classList.add('active');
     });
 
-    // Кнопки закрытия модалки
     document.getElementById('modalCancelBtn').addEventListener('click', () => {
         inputModalOverlay.classList.remove('active');
     });
 
-    // Сохранение модалки (Сферы или Цели)
-    document.getElementById('modalSaveBtn').addEventListener('click', () => {
+    document.getElementById('modalSaveBtn').addEventListener('click', async () => {
         const textVal = modalTextInput.value.trim();
+
+        if (modalMode === "editProfileName") {
+            userProfile.name = textVal || "Пользователь";
+            await saveData();
+            renderProfile();
+            inputModalOverlay.classList.remove('active');
+            return;
+        }
+
+        if (modalMode === "editMotto") {
+            userProfile.motto = textVal;
+            await saveData();
+            renderProfile();
+            inputModalOverlay.classList.remove('active');
+            return;
+        }
+
+        if (modalMode === "editYearGoal") {
+            userProfile.yearGoal = textVal;
+            await saveData();
+            renderProfile();
+            inputModalOverlay.classList.remove('active');
+            return;
+        }
+
         if (!textVal) return;
 
         if (modalMode === "category") {
             const newId = "cat_" + Date.now();
-            // Генерируем пастельный случайный цвет для карточки
             const colors = ["#FFF9E6", "#E6F7ED", "#FCE8E6", "#E6F0FA", "#EAF2F8", "#F5E6FA"];
             const randomColor = colors[Math.floor(Math.random() * colors.length)];
             
             categories.push({ id: newId, title: textVal, color: randomColor });
-            saveData();
+            await saveData();
             renderCategories();
         } 
         else if (modalMode === "todoText" || modalMode === "todoPhoto") {
             if (!allTodos[currentCategory.id]) allTodos[currentCategory.id] = [];
             
-            const steps = modalPlanInput.value.split(',')
+            const steps = modalPlanInput.value.split('\n')
                 .map(s => s.trim())
                 .filter(s => s.length > 0)
                 .map(s => ({ text: s, completed: false }));
@@ -1475,28 +1553,32 @@
             allTodos[currentCategory.id].push({
                 text: textVal,
                 completed: false,
-                image: pendingImageBase64,
+                images: pendingImagesArray, // Сохраняем полный массив фото
                 steps: steps
             });
-            saveData();
+            await saveData();
             renderTodos();
         } 
         else if (modalMode === "editTodo") {
             const todo = allTodos[currentCategory.id][editingTodoIndex];
             todo.text = textVal;
-            todo.steps = modalPlanInput.value.split(',')
+            
+            const oldSteps = todo.steps || [];
+            todo.steps = modalPlanInput.value.split('\n')
                 .map(s => s.trim())
                 .filter(s => s.length > 0)
-                .map(s => ({ text: s, completed: s.completed || false }));
+                .map(s => {
+                    const existingStep = oldSteps.find(os => os.text === s);
+                    return { text: s, completed: existingStep ? existingStep.completed : false };
+                });
             
-            saveData();
+            await saveData();
             renderTodos();
         }
 
         inputModalOverlay.classList.remove('active');
     });
 
-    // --- БЕКАПЫ И СБРОС ---
     document.getElementById('exportBackupBtn').addEventListener('click', () => {
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({
             categories, allTodos, userProfile
@@ -1515,13 +1597,13 @@
         const file = e.target.files[0];
         if (!file) return;
         const reader = new FileReader();
-        reader.onload = function(event) {
+        reader.onload = async function(event) {
             try {
                 const parsed = JSON.parse(event.target.result);
                 if (parsed.categories) categories = parsed.categories;
                 if (parsed.allTodos) allTodos = parsed.allTodos;
                 if (parsed.userProfile) userProfile = parsed.userProfile;
-                saveData();
+                await saveData();
                 alert('Данные успешно импортированы!');
                 window.location.reload();
             } catch(err) {
@@ -1531,22 +1613,49 @@
         reader.readAsText(file);
     });
 
-    document.getElementById('profileResetBtn').addEventListener('click', () => {
+    document.getElementById('profileResetBtn').addEventListener('click', async () => {
         if (confirm('Внимание! Это полностью удалит все сферы, загруженные картинки и обнулит статистику профиля. Продолжить?')) {
-            localStorage.clear();
+            await clearAllDB();
             window.location.reload();
         }
     });
 
-    function saveData() {
-        localStorage.setItem('premiumCategoriesList', JSON.stringify(categories));
-        localStorage.setItem('premiumBoardTodos', JSON.stringify(allTodos));
-        localStorage.setItem('premiumUserProfile', JSON.stringify(userProfile));
+    async function saveData() {
+        await setKV('premiumCategoriesList', categories);
+        await setKV('premiumBoardTodos', allTodos);
+        await setKV('premiumUserProfile', userProfile);
     }
 
-    // Инициализация при старте
-    renderCategories();
-    initNotifications();
+    (async () => {
+        await initDB();
+        
+        categories = await getKV('premiumCategoriesList', defaultCategories);
+        allTodos = await getKV('premiumBoardTodos', {});
+        
+        userProfile = await getKV('premiumUserProfile', { name: "Пользователь", motto: "", yearGoal: "", avatar: "" });
+
+        if (userProfile.name === "Слава" || !userProfile.name) {
+            userProfile.name = "Пользователь";
+            await saveData();
+        }
+
+        const isDarkTheme = (await getKV('premiumThemeDark', 'false')) === 'true';
+        if (isDarkTheme) {
+            document.body.classList.add('dark');
+        }
+        updateThemeMeta(isDarkTheme);
+
+        renderCategories();
+        initNotifications();
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('PWA ServiceWorker зарегистрирован:', reg.scope))
+                    .catch(err => console.log('Ошибка SW:', err));
+            });
+        }
+    })();
 </script>
 
 </body>
