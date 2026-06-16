@@ -58,41 +58,41 @@
             position: relative;
         }
 
-            .header {
-        background-color: var(--bg-color);
-        padding: 50px 24px 16px;
-        /* Используем Grid вместо Flex */
-        display: grid;
-        grid-template-columns: 1fr auto; /* Заголовок занимает всё место, кнопки — только сколько нужно */
-        align-items: start;
-        gap: 10px; /* Отступ между текстом и кнопками */
-        position: relative;
-        z-index: 10;
-    }
+        .header {
+            background-color: var(--bg-color);
+            padding: 50px 24px 16px;
+            /* Используем Grid вместо Flex */
+            display: grid;
+            grid-template-columns: 1fr auto; /* Заголовок занимает всё место, кнопки — только сколько нужно */
+            align-items: start;
+            gap: 10px; /* Отступ между текстом и кнопками */
+            position: relative;
+            z-index: 10;
+        }
 
-    .header-left {
-        display: flex;
-        flex-direction: column;
-        min-width: 0; /* Важно: позволяет заголовку правильно сжиматься */
-    }
+        .header-left {
+            display: flex;
+            flex-direction: column;
+            min-width: 0; /* Важно: позволяет заголовку правильно сжиматься */
+        }
 
-    #mainTitle {
-        font-size: 26px;
-        font-weight: 700;
-        line-height: 1.1;
-        color: var(--text-main);
-        word-wrap: break-word; /* Текст переносится на новую строку */
-        cursor: pointer;
-    }
+        #mainTitle {
+            font-size: 26px;
+            font-weight: 700;
+            line-height: 1.1;
+            color: var(--text-main);
+            word-wrap: break-word; /* Текст переносится на новую строку */
+            cursor: pointer;
+        }
 
-    .header-actions {
-        display: flex;
-        gap: 12px;
-        align-items: center;
-        /* Кнопки всегда остаются справа в своей колонке */
-        justify-self: end;
-        flex-shrink: 0;
-    }
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            /* Кнопки всегда остаются справа в своей колонке */
+            justify-self: end;
+            flex-shrink: 0;
+        }
         
         #mainTitle:active {
             opacity: 0.6;
@@ -903,11 +903,18 @@
     let categories = JSON.parse(localStorage.getItem('premiumCategoriesList')) || defaultCategories;
     let allTodos = JSON.parse(localStorage.getItem('premiumBoardTodos')) || {};
     
+    // Изменено имя по умолчанию со "Слава" на "Пользователь"
     let userProfile = JSON.parse(localStorage.getItem('premiumUserProfile')) || {
-        name: "Слава",
+        name: "Пользователь",
         motto: "",
         avatar: ""
     };
+    
+    // Принудительный сброс старого кэшированного имени, если оно осталось в localStorage
+    if (userProfile.name === "Слава") {
+        userProfile.name = "Пользователь";
+        localStorage.setItem('premiumUserProfile', JSON.stringify(userProfile));
+    }
     
     let currentCategory = null;
     let isProfileActive = false;
@@ -998,6 +1005,84 @@
     if (localStorage.getItem('premiumThemeDark') === 'true') {
         document.body.classList.add('dark');
     }
+
+    // --- ЛОГИКА ПЕРЕНОСА СФЕР ЖИЗНИ (DRAG & DROP) ---
+    let draggedElement = null;
+    const placeholder = document.createElement('div');
+    placeholder.className = 'grid-item-placeholder';
+
+    categoriesGrid.addEventListener('pointerdown', (e) => {
+        if (!isEditMode) return;
+        const target = e.target.closest('.grid-item');
+        if (!target || target.classList.contains('add-btn-card')) return;
+        if (e.target.closest('.delete-cat-btn')) return;
+
+        draggedElement = target;
+        categoriesGrid.setPointerCapture(e.pointerId);
+
+        const rect = draggedElement.getBoundingClientRect();
+        draggedElement.classList.add('dragging');
+        draggedElement.style.width = rect.width + 'px';
+        draggedElement.style.height = rect.height + 'px';
+        draggedElement.style.left = rect.left + 'px';
+        draggedElement.style.top = rect.top + 'px';
+
+        draggedElement.parentNode.insertBefore(placeholder, draggedElement);
+    });
+
+    categoriesGrid.addEventListener('pointermove', (e) => {
+        if (!draggedElement) return;
+
+        const rect = placeholder.getBoundingClientRect();
+        draggedElement.style.left = (e.clientX - rect.width / 2) + 'px';
+        draggedElement.style.top = (e.clientY - rect.height / 2) + 'px';
+
+        draggedElement.style.pointerEvents = 'none';
+        const elementUnder = document.elementFromPoint(e.clientX, e.clientY);
+        draggedElement.style.pointerEvents = 'auto';
+
+        if (!elementUnder) return;
+        const closestItem = elementUnder.closest('.grid-item');
+
+        if (closestItem && closestItem !== draggedElement && !closestItem.classList.contains('add-btn-card')) {
+            const children = Array.from(categoriesGrid.children);
+            const draggedIdx = children.indexOf(placeholder);
+            const targetIdx = children.indexOf(closestItem);
+
+            if (draggedIdx < targetIdx) {
+                categoriesGrid.insertBefore(placeholder, closestItem.nextSibling);
+            } else {
+                categoriesGrid.insertBefore(placeholder, closestItem);
+            }
+        }
+    });
+
+    function endDrag(pointerId) {
+        if (!draggedElement) return;
+        if (pointerId !== undefined) {
+            categoriesGrid.releasePointerCapture(pointerId);
+        }
+
+        draggedElement.classList.remove('dragging');
+        draggedElement.style.width = '';
+        draggedElement.style.height = '';
+        draggedElement.style.left = '';
+        draggedElement.style.top = '';
+
+        if (placeholder.parentNode) {
+            placeholder.parentNode.insertBefore(draggedElement, placeholder);
+            placeholder.remove();
+        }
+
+        const currentItems = Array.from(categoriesGrid.querySelectorAll('.grid-item:not(.add-btn-card)'));
+        categories = currentItems.map(item => categories.find(c => c.id === item.dataset.id)).filter(Boolean);
+        saveData();
+
+        draggedElement = null;
+    }
+
+    categoriesGrid.addEventListener('pointerup', (e) => endDrag(e.pointerId));
+    categoriesGrid.addEventListener('pointercancel', (e) => endDrag(e.pointerId));
 
     // --- РЕНДЕРИНГ КАТЕГОРИЙ ---
     function renderCategories() {
@@ -1284,7 +1369,7 @@
     document.getElementById('profileNameRow').addEventListener('click', () => {
         const newName = prompt("Введите ваше имя:", userProfile.name);
         if (newName !== null) {
-            userProfile.name = newName.trim() || "Профиль";
+            userProfile.name = newName.trim() || "Пользователь";
             saveData();
             renderProfile();
         }
